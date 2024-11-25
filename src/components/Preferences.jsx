@@ -1,9 +1,7 @@
 import React from "react";
 
-function Preferences() {
+export default function Preferences() {
     return (
         <h2>Preferences</h2>
     );
 }
-
-export default Preferences;

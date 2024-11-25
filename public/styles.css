@@ -101,3 +101,8 @@ form.create-note button {
   cursor: pointer;
   outline: none;
 }
+
+/* My added styles */
+.wrapper {
+  padding: 20px;
+}
