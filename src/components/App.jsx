@@ -10,6 +10,11 @@ import Login from "./Login";
 
 function App() {
   const [notes, setNotes] = useState([]);
+  const [token, setToken] = useState();
+
+  if (!token) {
+    return <Login setToken={setToken} />
+  }
 
   function addNote(newNote) {
     setNotes(prevNotes => {
@@ -27,7 +32,6 @@ function App() {
 
   return (
     <div>
-      <Login />
       <Header />
       <div className="wrapper">
         <Router>
