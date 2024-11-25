@@ -6,6 +6,7 @@ import Note from "./Note";
 import CreateArea from "./CreateArea";
 import Dashboard from "./Dashboard";
 import Preferences from "./Preferences";
+import Login from "./Login";
 
 function App() {
   const [notes, setNotes] = useState([]);
@@ -26,6 +27,7 @@ function App() {
 
   return (
     <div>
+      <Login />
       <Header />
       <div className="wrapper">
         <Router>
