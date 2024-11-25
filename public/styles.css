@@ -101,3 +101,14 @@ form.create-note button {
   cursor: pointer;
   outline: none;
 }
+
+/* My added styles */
+.wrapper {
+  padding: 20px;
+}
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
