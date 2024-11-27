@@ -18,6 +18,8 @@
     "webpack": "^5.96.1"
   },
   "devDependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
     "typescript": "3.3.3"
   },
   "scripts": {
