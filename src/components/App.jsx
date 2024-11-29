@@ -12,9 +12,9 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [token, setToken] = useState();
 
-  if (!token) {
-    return <Login setToken={setToken} />
-  }
+  // if (!token) {
+  //   return <Login setToken={setToken} />
+  // }
 
   function addNote(newNote) {
     setNotes(prevNotes => {
@@ -47,8 +47,10 @@ function App() {
           <Note
             key={index}
             id={index}
-            title={noteItem.title}
-            content={noteItem.content}
+            section={noteItem.section}
+            linkTitle={noteItem.linkTitle}
+            url={noteItem.url}
+            description={noteItem.description}
             onDelete={deleteNote}
           />
         );
