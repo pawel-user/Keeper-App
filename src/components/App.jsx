@@ -47,8 +47,10 @@ function App() {
           <Note
             key={index}
             id={index}
-            title={noteItem.title}
-            content={noteItem.content}
+            section={noteItem.section}
+            linkTitle={noteItem.linkTitle}
+            url={noteItem.url}
+            description={noteItem.description}
             onDelete={deleteNote}
           />
         );

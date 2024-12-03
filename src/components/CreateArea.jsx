@@ -7,8 +7,10 @@ function CreateArea(props) {
   const [isExpanded, setExpanded] = useState(false);
 
   const [note, setNote] = useState({
-    title: "",
-    content: "",
+    section: "",
+    linkTitle: "",
+    url: "",
+    description: "",
   });
 
   function handleChange(event) {
@@ -25,8 +27,10 @@ function CreateArea(props) {
   function submitNote(event) {
     props.onAdd(note);
     setNote({
-      title: "",
-      content: "",
+      section: "",
+      linkTitle: "",
+      url: "",
+      description: "",
     });
     event.preventDefault();
   }
@@ -40,18 +44,36 @@ function CreateArea(props) {
       <form className="create-note">
         {isExpanded ? (
           <input
-            name="title"
+            name="section"
             onChange={handleChange}
-            value={note.title}
-            placeholder="Title"
+            value={note.section}
+            placeholder="Section"
           />
         ) : null}
 
+        {isExpanded ? (
+          <input
+            name="url"
+            onChange={handleChange}
+            value={note.url}
+            placeholder="URL website address"
+          />
+        ) : null}
+
+        {isExpanded ? (
+          <input
+            name="linkTitle"
+            onChange={handleChange}
+            value={note.linkTitle}
+            placeholder="Title of the website link"
+          />
+        ) : null}
+        
         <textarea
-          name="content"
+          name="description"
           onClick={expand}
           onChange={handleChange}
-          value={note.content}
+          value={note.description}
           placeholder="Take a note..."
           rows={isExpanded ? 3 : 1}
         />
