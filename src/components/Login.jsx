@@ -1,18 +1,36 @@
 import React, {useState} from "react";
-import PropTypes from "prop-types";
+import propTypes from "prop-types";
 // import './../public/styles.css';
 import './../styles-link.css';
 import axios from "axios";
 
-async function loginUser(credentials) {
-    try {
-        const response = await axios.post('http://localhost:8080/login');
-        return response;
-    } catch {
-        console.error(error);
-    }
-}
+//First solution
+// async function loginUser(credentials) {
+//     try {
+//         const response = await axios.post('http://localhost:8080/login');
 
+//         // JSON.stringify(credentials);
+
+//         console.log(response.data);
+//         // return response;
+//     } catch {
+//         console.error(error);
+//     }
+// }
+
+async function loginUser(credentials) 
+{ try { const response = await axios.post('http://localhost:8080/login', credentials, { headers: { 'Content-Type': 'application/json' } }); return response.data; } catch (error) { console.error('Error logging in:', error); throw error; } }
+// Second solution
+// async function loginUser(credentials) {
+//     return fetch('http://localhost:8080/login', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify(credentials)
+//     })
+//       .then(data => data.json())
+//    }
 
 export default function Login({setToken}) {
     const [username, setUserName] = useState();
@@ -48,6 +66,6 @@ export default function Login({setToken}) {
     );
 }
 
-Login.PropTypes = {
-    setToken: PropTypes.func.isRequired
+Login.propTypes = {
+    setToken: propTypes.func.isRequired
 }
