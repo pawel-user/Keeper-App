@@ -7,10 +7,25 @@ import CreateArea from "./CreateArea";
 import Dashboard from "./Dashboard";
 import Preferences from "./Preferences";
 import Login from "./Login";
+import useToken from "./useToken";
+
+// function setToken(userToken) {
+//   sessionStorage.setItem('token', JSON.stringify(userToken));
+// }
+
+// function getToken() {
+//   const tokenString = sessionStorage.getItem('token');
+//   const userToken = JSON.parse(tokenString);
+//   return userToken?.token
+// }
 
 function App() {
   const [notes, setNotes] = useState([]);
-  const [token, setToken] = useState();
+  // const [token, setToken] = useState();
+
+  // const token = getToken();
+
+  const { token, setToken } = useToken();
 
   if (!token) {
     return <Login setToken={setToken} />
