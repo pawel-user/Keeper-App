@@ -1,7 +1,10 @@
-const express = require('express');
-const cors = require('cors');
+import express from "express";
+import cors from "cors";
+
 const app = express();
 const port = 8080;
+const API_URL = `http://localhost:${port}`;
+
 
 app.use(cors());
 
@@ -11,4 +14,4 @@ app.use('/login', (req, res) => {
     });
 });
 
-app.listen(port, () => console.log(`API is running on http://localhost:${port}/login`));
+app.listen(port, () => console.log(`API is running on ${API_URL}/login`));
