@@ -31,7 +31,7 @@ async function loginUser(credentials) {
     throw error;
   }
 }
-export default function Login({ setToken }) {
+export default function Login({ setToken, setLogin }) {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
 
@@ -42,12 +42,13 @@ export default function Login({ setToken }) {
       password,
     });
     setToken(token);
+    setLogin(true);
   };
 
   return (
     <div className="login-wrapper">
-      <h1>Log In Panel</h1>
       <form onSubmit={handleSubmit}>
+        <h1>Log In Panel</h1>
         <label>
           <p>Username</p>
           <input
