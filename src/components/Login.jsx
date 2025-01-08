@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import propTypes from "prop-types";
-// import './../public/styles.css';
 import "./../styles-link.css";
 import axios from "axios";
 
@@ -34,6 +34,7 @@ async function loginUser(credentials) {
 export default function Login({ setToken, setLogin }) {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,6 +44,7 @@ export default function Login({ setToken, setLogin }) {
     });
     setToken(token);
     setLogin(true);
+    navigate("/");
   };
 
   return (
@@ -64,7 +66,7 @@ export default function Login({ setToken, setLogin }) {
           />
         </label>
         <div>
-          <button type="submit">Submit</button>
+            <button type="submit">Submit</button>
         </div>
       </form>
     </div>

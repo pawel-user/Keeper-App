@@ -1,6 +1,11 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { Fab } from "@mui/material";
+import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
+import LoginIcon from "@mui/icons-material/Login";
+
+
 export default function Welcome() {
     const navigate = useNavigate();
   
