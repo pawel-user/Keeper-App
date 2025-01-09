@@ -31,7 +31,7 @@ function App() {
   return (
     <Router>
       <div>
-        <Header />
+        <Header setLogin={setLogin} setToken={setToken}/>
         {!isLogged && !token ? (
           <div className="main-panel-wrapper">
             <Routes>
