@@ -6,6 +6,7 @@ import Note from "./Note";
 import CreateArea from "./CreateArea";
 import Welcome from "./Welcome";
 import Login from "./Login";
+import Register from "./Register";
 import useToken from "./useToken";
 
 
@@ -36,7 +37,7 @@ function App() {
           <div className="main-panel-wrapper">
             <Routes>
               <Route path="/" element={<Welcome />} />
-              {/* <Route path="/preferences" element={<Preferences />} /> */}
+              <Route path="/register" element={<Register />} />
               <Route
                 path="/login"
                 element={<Login setToken={setToken} setLogin={setLogin} />}

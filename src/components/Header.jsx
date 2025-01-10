@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import Logout from "./Logout";
 
-import { Fab } from "@mui/material";
 import HighlightIcon from "@mui/icons-material/Highlight";
 
 function Header({setLogin, setToken}) {
