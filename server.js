@@ -14,4 +14,10 @@ app.use('/login', (req, res) => {
     });
 });
 
+app.use('/logout', (req, res) => {
+    res.send({
+        token: ''
+    });
+});
+
 app.listen(port, () => console.log(`API is running on ${API_URL}/login`));

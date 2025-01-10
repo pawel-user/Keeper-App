@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import propTypes from "prop-types";
-// import './../public/styles.css';
 import "./../styles-link.css";
 import axios from "axios";
 
@@ -31,9 +31,10 @@ async function loginUser(credentials) {
     throw error;
   }
 }
-export default function Login({ setToken }) {
+export default function Login({ setToken, setLogin }) {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,12 +43,14 @@ export default function Login({ setToken }) {
       password,
     });
     setToken(token);
+    setLogin(true);
+    navigate("/");
   };
 
   return (
     <div className="login-wrapper">
-      <h1>Log In Panel</h1>
       <form onSubmit={handleSubmit}>
+        <h1>Log In Panel</h1>
         <label>
           <p>Username</p>
           <input
@@ -63,7 +66,7 @@ export default function Login({ setToken }) {
           />
         </label>
         <div>
-          <button type="submit">Submit</button>
+            <button type="submit">Submit</button>
         </div>
       </form>
     </div>
