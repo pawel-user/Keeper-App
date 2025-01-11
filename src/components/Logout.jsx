@@ -16,7 +16,7 @@ async function logoutUser(credentials) {
   }
 }
 
-export default function Logout({ setLogin, setToken, setLogout }) {
+export default function Logout({ setLogin, setToken}) {
   const navigate = useNavigate();
 
   const handleLogout = async (e) => {
@@ -24,7 +24,6 @@ export default function Logout({ setLogin, setToken, setLogout }) {
     const token = await logoutUser();
 
     setLogin(false);
-    setLogout(true);
     setToken(token);
     navigate("/");
   };

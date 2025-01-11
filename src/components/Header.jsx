@@ -1,20 +1,16 @@
-import React, {useState} from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import Logout from "./Logout";
 
 import HighlightIcon from "@mui/icons-material/Highlight";
 
-function Header({setLogin, setToken}) {
-  const [isLoggedOut, setLogout] = useState(true);
-  const navigate = useNavigate();
-
+function Header({isLoggedIn, setLogin, setToken}) {
 
   return (
     <header>
       <h1>
         <HighlightIcon/> Keeper
       </h1>
-      {isLoggedOut ? <Logout setLogin={setLogin} setToken={setToken} setLogout={setLogout}/> : null}
+        {!isLoggedIn ? <Logout setLogin={setLogin} setToken={setToken}/> : null}
     </header>
   );
 }
