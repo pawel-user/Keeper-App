@@ -25,13 +25,15 @@ async function loginUser(credentials) {
       credentials,
       { headers: { "Content-Type": "application/json" } }
     );
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error logging in:", error);
     throw error;
   }
 }
-export default function Login({ setToken, setLogin }) {
+export default function Login({ setToken, setLogin, setAlert }) {
+  // console.log("Login component rendered"); // Dodaj log przy renderowaniu komponentu  
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
   const navigate = useNavigate();
@@ -42,8 +44,10 @@ export default function Login({ setToken, setLogin }) {
       username,
       password,
     });
+    // console.log(token);
     setToken(token);
     setLogin(true);
+    setAlert(true);
     navigate("/");
   };
 
@@ -56,6 +60,7 @@ export default function Login({ setToken, setLogin }) {
           <input
             type="text"
             onChange={(event) => setUserName(event.target.value)}
+            autoComplete="username"
           />
         </label>
         <label>
@@ -63,6 +68,7 @@ export default function Login({ setToken, setLogin }) {
           <input
             type="password"
             onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
           />
         </label>
         <div>

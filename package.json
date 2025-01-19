@@ -21,6 +21,7 @@
     "webpack": "^5.97.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "typescript": "3.3.3"

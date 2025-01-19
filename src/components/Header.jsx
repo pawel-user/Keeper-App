@@ -10,7 +10,7 @@ function Header({isLoggedIn, setLogin, setToken}) {
       <h1>
         <HighlightIcon/> Keeper
       </h1>
-        {!isLoggedIn ? <Logout setLogin={setLogin} setToken={setToken}/> : null}
+        {isLoggedIn ? <Logout setLogin={setLogin} setToken={setToken}/> : null}
     </header>
   );
 }
