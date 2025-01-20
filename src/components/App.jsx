@@ -29,10 +29,10 @@ function App() {
       return;
     }
     getUsers().then((userItems) => {
-      console.log("User Items: ", userItems);
+      // console.log("User Items: ", userItems);
       if (mounted.current) {
         setUsers(userItems || []); // Ustaw domyślną wartość jako pustą tablicę
-        console.log("Users after setting state:", userItems);      
+        // console.log("Users after setting state:", userItems);      
       }
     });
     return () => (mounted.current = false);
