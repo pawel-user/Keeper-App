@@ -1,24 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import propTypes from "prop-types";
-import "./../styles-link.css";
 import axios from "axios";
+import propTypes from "prop-types";
 
-//First solution
-// async function loginUser(credentials) {
-//     try {
-//         const response = await axios.post('http://localhost:8080/login');
-
-//         // JSON.stringify(credentials);
-
-//         console.log(response.data);
-//         // return response;
-//     } catch {
-//         console.error(error);
-//     }
-// }
-
-async function loginUser(credentials) {
+async function loginUser(credentials, setAlert) {
   try {
     const response = await axios.post(
       "http://localhost:8080/login",
@@ -28,23 +13,38 @@ async function loginUser(credentials) {
     return response.data;
   } catch (error) {
     console.error("Error logging in:", error);
+    if (error.response && error.response.status === 401) {
+      setAlert("error", "Login Failed. Invalid credentials.");
+    } else {
+      setAlert("error", "Login Failed. Please try again later.");
+    }
     throw error;
   }
 }
-export default function Login({ setToken, setLogin }) {
+
+export default function Login({ setToken, setLogin, setAlert }) {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = await loginUser({
-      username,
-      password,
-    });
-    setToken(token);
-    setLogin(true);
-    navigate("/");
+    console.log("Logging in with credentials:", { username, password }); // Dodaj logowanie    
+    try {
+      const token = await loginUser(
+        {
+          username,
+          password,
+        },
+        setAlert
+      );
+      setToken(token);
+      setLogin(true);
+      setAlert("login", "Login Successful");
+      navigate("/");
+    } catch (error) {
+      // `setAlert` is already called in `loginUser` in case of error
+    }
   };
 
   return (
@@ -56,6 +56,7 @@ export default function Login({ setToken, setLogin }) {
           <input
             type="text"
             onChange={(event) => setUserName(event.target.value)}
+            autoComplete="username"
           />
         </label>
         <label>
@@ -63,10 +64,11 @@ export default function Login({ setToken, setLogin }) {
           <input
             type="password"
             onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
           />
         </label>
         <div>
-            <button type="submit">Submit</button>
+          <button type="submit">Submit</button>
         </div>
       </form>
     </div>
@@ -75,4 +77,6 @@ export default function Login({ setToken, setLogin }) {
 
 Login.propTypes = {
   setToken: propTypes.func.isRequired,
+  setLogin: propTypes.func.isRequired, 
+  setAlert: propTypes.func.isRequired,
 };

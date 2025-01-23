@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -9,13 +9,55 @@ import Login from "./Login";
 import Logout from "./Logout";
 import Register from "./Register";
 import useToken from "./useToken";
-
+import { getUsers } from "../services/registeredUsers.js";
 
 function App() {
+  const [alert, setAlert] = useState({
+    type: "",
+    message: "",
+    visible: false,
+  });
   const [notes, setNotes] = useState([]);
+  const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
   const [isLoggedIn, setLogin] = useState(false);
-  // const [isLoggedOut, setLogout] = useState(true);
+  const mounted = useRef(true);
+
+  const handleAlert = (type, message) => {
+    setAlert({
+      type,
+      message,
+      visible: true,
+    });
+  };
+
+  useEffect(() => {
+    mounted.current = true;
+    if (!alert.visible) {
+      return;
+    }
+    if (alert.type === "login" || alert.type === "register") {
+      getUsers().then((userItems) => {
+        if (mounted.current) {
+          setUsers(userItems || []);
+        }
+      });
+    }
+    return () => (mounted.current = false);
+  }, [alert]);
+
+  useEffect(() => {
+    if (alert.visible) {
+      setTimeout(() => {
+        if (mounted.current) {
+          setAlert((prevAlert) => ({
+            ...prevAlert,
+            visible: false,
+          }));
+        }
+      }, 2000);
+    }
+  }, [alert]);
 
   function addNote(newNote) {
     setNotes((prevNotes) => {
@@ -34,16 +76,34 @@ function App() {
   return (
     <Router>
       <div>
-        <Header isLoggedIn={isLoggedIn} setToken={setToken} setLogin={setLogin}/>
-        {/* {!isLoggedIn ? <Logout setLogin={setLogin} setToken={setToken}/> : null} */}
+        <Header
+          isLoggedIn={isLoggedIn}
+          setToken={setToken}
+          setLogin={setLogin}
+        />
+        {alert.visible ? (
+          <div className="main-panel-wrapper">
+            <h2>{alert.message}</h2>
+          </div>
+        ) : null}
+
         {!isLoggedIn && !token ? (
           <div className="main-panel-wrapper">
             <Routes>
               <Route path="/" element={<Welcome />} />
-              <Route path="/register" element={<Register />} />
+              <Route
+                path="/register"
+                element={<Register setAlert={handleAlert} />}
+              />
               <Route
                 path="/login"
-                element={<Login setToken={setToken} setLogin={setLogin} />}
+                element={
+                  <Login
+                    setToken={setToken}
+                    setLogin={setLogin}
+                    setAlert={handleAlert}
+                  />
+                }
               />
             </Routes>
           </div>
@@ -65,7 +125,6 @@ function App() {
             })}
           </div>
         )}
-
         <Footer />
       </div>
     </Router>
@@ -73,7 +132,3 @@ function App() {
 }
 
 export default App;
-
-{
-  /* <Login setToken={setToken} /> */
-}
