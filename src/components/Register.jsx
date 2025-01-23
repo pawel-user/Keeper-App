@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { addUser } from "../services/registeredUsers";
 
@@ -19,19 +20,20 @@ async function registerUser(newUserData) {
 
 export default function Register({ setAlert }) {
   // console.log("Users inside Register component:", users); // Logowanie users
-  
+
   const [userInput, setUserInput] = useState({
     username: "",
     email: "",
     password: "",
-    repeatedPassword: ""
+    repeatedPassword: "",
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserInput((prevInput) => ({
       ...prevInput,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -43,15 +45,25 @@ export default function Register({ setAlert }) {
       const response = await registerUser(userInput);
       if (response) {
         // Wywołanie asynchronicznej funkcji addUser(), aby zapisać nowego użytkownika do pliku JSON
-        await addUser(userInput); 
+        await addUser(userInput);
         setAlert("register", "Registration successful!");
+        // Opóźnienie na 3 sekundy przed nawigacją do innej strony
+        setTimeout(() => {
+          navigate("/");
+        }, 2000); // 2000 milisekund = 2 sekundy
       }
     } catch (error) {
-      console.error("Error during registration:", error);      
+      console.error("Error during registration:", error);
       if (error.response && error.response.status === 409) {
-        setAlert("error", "This user already exists! Try login or enter other data to register");
+        setAlert(
+          "error",
+          "This user already exists! Try login or enter other data to register"
+        );
       } else {
-        setAlert("error", "Registration Failed. The user credentials are not the same! Please try again.");
+        setAlert(
+          "error",
+          "Registration Failed. The user credentials are not the same! Please try again."
+        );
       }
     }
   };

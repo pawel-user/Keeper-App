@@ -31,24 +31,3 @@ export async function addUser(newUser) {
     console.error("Error adding user: ", error);
   }
 }
-
-//Funkcja dodawania nowego użytkownika
-// export async function addUser(newUser) {
-//   try {
-//     // Wczytaj aktualne dane użytkowników
-//     const usersData = await fs.promises.readFile(dbPath, "utf-8");
-//     const jsonData = JSON.parse(usersData);
-//     const users = jsonData.users;
-
-//     // Dodaj nowego użytkownika
-//     const newId = users.length > 0 ? users[users.length - 1].id + 1 : 1;
-//     const userWithId = { id: newId, ...newUser};
-//     users.push(userWithId);
-
-//     // Zapisz zaktualizowane dane do pliku
-//     await fs.promises.writeFile(dbPath, JSON.stringify({ users }, null, 2), "utf-8");
-//     console.log("New user added successfully!");
-//   } catch (error) {
-//     console.error("Error adding user: ", error);
-//   }
-// }

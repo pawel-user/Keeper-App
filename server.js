@@ -3,10 +3,15 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config(); // Ładowanie zmiennych środowiskowych z pliku .env
 
 const app = express();
 const port = 8080;
 export const API_URL = `http://localhost:${port}`;
+const SECRET_KEY = process.env.SECRET_KEY; // Odczytywanie SECRET_KEY z pliku konfiguracyjnego .env
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
@@ -53,7 +58,13 @@ app.post("/login", (req, res) => {
       userItem.username === username && userItem.password === password
   );
   if (user) {
-    res.send({ token: user.token });
+    // Generowanie tokena podczas logowania użytkownika
+    const token = jwt.sign(
+      { username: user.username, id: user.id },
+      SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+    res.send({ token });
   } else {
     console.log("Invalid credentials");
     res.status(401).json({ error: "Invalid credentials" }); // Zwracanie JSON zamiast tekstu
@@ -85,13 +96,20 @@ app.post("/register", (req, res) => {
         ? req.db.users[req.db.users.length - 1].id + 1
         : 1;
 
+    // Generate a token
+    const token = jwt.sign(
+      { username: uploadedUser.username, id: newId },
+      SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
     // Nowy użytkownik bez repeatedPassword
     const newUser = {
       id: newId,
       username: uploadedUser.username,
       email: uploadedUser.email,
       password: uploadedUser.password,
-      token: "", // Możesz dodać mechanizm generowania tokena, jeśli potrzebny
+      token // Assign generated token
     };
     req.db.users.push(newUser);
 
