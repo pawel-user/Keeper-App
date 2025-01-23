@@ -8,7 +8,7 @@ const app = express();
 const port = 8080;
 export const API_URL = `http://localhost:${port}`;
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 // Uzyskanie __dirname w module ES
@@ -47,6 +47,7 @@ app.get("/users", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
+  console.log("Received login data:", { username, password }); // Dodaj logowanie
   const user = req.db.users.find(
     (userItem) =>
       userItem.username === username && userItem.password === password
@@ -55,7 +56,61 @@ app.post("/login", (req, res) => {
     res.send({ token: user.token });
   } else {
     console.log("Invalid credentials");
-    res.status(401).send("Invalid credentials");
+    res.status(401).json({ error: "Invalid credentials" }); // Zwracanie JSON zamiast tekstu
+  }
+});
+
+app.post("/register", (req, res) => {
+  try {
+    const uploadedUser = req.body;
+    console.log("New user data received:", uploadedUser);
+
+    const userExists = req.db.users.find(
+      (userItem) =>
+        userItem.username === uploadedUser.username ||
+        userItem.email === uploadedUser.email
+    );
+
+    if (userExists) {
+      console.log("The user with this data already exists!");
+      return res.status(409).send("User already exists");
+    } else if (uploadedUser.password !== uploadedUser.repeatedPassword) {
+      console.log("The user credentials are not the same!");
+      return res.status(400).send("User credentials failed");
+    }
+
+    // Generowanie unikalnego identyfikatora dla nowego zarejestrowanego użytkownika
+    const newId =
+      req.db.users.length > 0
+        ? req.db.users[req.db.users.length - 1].id + 1
+        : 1;
+
+    // Nowy użytkownik bez repeatedPassword
+    const newUser = {
+      id: newId,
+      username: uploadedUser.username,
+      email: uploadedUser.email,
+      password: uploadedUser.password,
+      token: "", // Możesz dodać mechanizm generowania tokena, jeśli potrzebny
+    };
+    req.db.users.push(newUser);
+
+    fs.writeFile(
+      dbPath,
+      JSON.stringify({ users: req.db.users }, null, 2),
+      (err) => {
+        if (err) {
+          console.error("Error writing to db.json:", err);
+          return res.status(500).send("Internal Server Error");
+        } else {
+          console.log("New user added successfully!");
+          return res.status(201).send("User registered successfully");
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error in /register route:", error);
+    return res.status(500).send("Internal Server Error");
   }
 });
 

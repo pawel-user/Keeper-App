@@ -1,55 +1,102 @@
-import React, {useState} from "react";
-import { getUsers} from "../services/registeredUsers";
+import React, { useState } from "react";
+import axios from "axios";
+import { addUser } from "../services/registeredUsers";
 
+async function registerUser(newUserData) {
+  try {
+    const response = await axios.post(
+      "http://localhost:8080/register",
+      newUserData,
+      { headers: { "Content-Type": "application/json" } }
+    );
+    // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Registration error: ", error);
+    throw error;
+  }
+}
 
-export default function Register() {
-  const [username, setUserName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatedPassword, setRepeatedPassword] = useState("");
-  // const navigate = useNavigate();
+export default function Register({ setAlert }) {
+  // console.log("Users inside Register component:", users); // Logowanie users
+  
+  const [userInput, setUserInput] = useState({
+    username: "",
+    email: "",
+    password: "",
+    repeatedPassword: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUserInput((prevInput) => ({
+      ...prevInput,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(userInput);
+    console.log("Submitting registration form with data:", userInput);
+    try {
+      const response = await registerUser(userInput);
+      if (response) {
+        // Wywołanie asynchronicznej funkcji addUser(), aby zapisać nowego użytkownika do pliku JSON
+        await addUser(userInput); 
+        setAlert("register", "Registration successful!");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);      
+      if (error.response && error.response.status === 409) {
+        setAlert("error", "This user already exists! Try login or enter other data to register");
+      } else {
+        setAlert("error", "Registration Failed. The user credentials are not the same! Please try again.");
+      }
+    }
+  };
 
   return (
     <div className="login-wrapper">
-      <form>
+      <form onSubmit={handleSubmit}>
         <h1>Sign Up Panel</h1>
         <label>
           <p>Username</p>
           <input
             type="text"
-            // placeholder="Type your username"
-            onChange={(event) => setUserName(event.target.value)}
-            value={username}
+            onChange={handleChange}
+            value={userInput.username}
+            name="username"
             autoComplete="username"
-            />
+          />
         </label>
         <label>
           <p>Email address</p>
           <input
             type="email"
-            // placeholder="Type your email address"
-            onChange={(event) => setEmail(event.target.value)}
-            value={email}
+            onChange={handleChange}
+            value={userInput.email}
+            name="email"
             autoComplete="email"
-            />
+          />
         </label>
         <label>
           <p>Password</p>
           <input
             type="password"
-            // placeholder="Type your password"
-            onChange={(event) => setPassword(event.target.value)}
-            value={password}
+            onChange={handleChange}
+            value={userInput.password}
+            name="password"
             autoComplete="new-password"
-            />
+          />
         </label>
         <label>
           <p>Password repeat</p>
           <input
             type="password"
-            // placeholder="Repeat your password"
-            onChange={(event) => setRepeatedPassword(event.target.value)}
-            value={repeatedPassword}
+            onChange={handleChange}
+            value={userInput.repeatedPassword}
+            name="repeatedPassword"
             autoComplete="new-password"
           />
         </label>

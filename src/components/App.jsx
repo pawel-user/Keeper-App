@@ -9,40 +9,51 @@ import Login from "./Login";
 import Logout from "./Logout";
 import Register from "./Register";
 import useToken from "./useToken";
-
 import { getUsers } from "../services/registeredUsers.js";
 
 function App() {
-  const [alert, setAlert] = useState(false);
+  const [alert, setAlert] = useState({
+    type: "",
+    message: "",
+    visible: false,
+  });
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
   const [isLoggedIn, setLogin] = useState(false);
-  // const [isLoggedOut, setLogout] = useState(true);
-
   const mounted = useRef(true);
+
+  const handleAlert = (type, message) => {
+    setAlert({
+      type,
+      message,
+      visible: true,
+    });
+  };
 
   useEffect(() => {
     mounted.current = true;
-    if (!alert) {
-      // console.log(users);
+    if (!alert.visible) {
       return;
     }
-    getUsers().then((userItems) => {
-      // console.log("User Items: ", userItems);
-      if (mounted.current) {
-        setUsers(userItems || []); // Ustaw domyślną wartość jako pustą tablicę
-        // console.log("Users after setting state:", userItems);      
-      }
-    });
+    if (alert.type === "login" || alert.type === "register") {
+      getUsers().then((userItems) => {
+        if (mounted.current) {
+          setUsers(userItems || []);
+        }
+      });
+    }
     return () => (mounted.current = false);
   }, [alert]);
 
   useEffect(() => {
-    if (alert) {
+    if (alert.visible) {
       setTimeout(() => {
         if (mounted.current) {
-          setAlert(false);
+          setAlert((prevAlert) => ({
+            ...prevAlert,
+            visible: false,
+          }));
         }
       }, 2000);
     }
@@ -70,23 +81,34 @@ function App() {
           setToken={setToken}
           setLogin={setLogin}
         />
+        {alert.visible ? (
+          <div className="main-panel-wrapper">
+            <h2>{alert.message}</h2>
+          </div>
+        ) : null}
+
         {!isLoggedIn && !token ? (
           <div className="main-panel-wrapper">
             <Routes>
               <Route path="/" element={<Welcome />} />
-              <Route path="/register" element={<Register />} />
+              <Route
+                path="/register"
+                element={<Register setAlert={handleAlert} />}
+              />
               <Route
                 path="/login"
-                element={<Login setToken={setToken} setLogin={setLogin} setAlert={setAlert} />}
+                element={
+                  <Login
+                    setToken={setToken}
+                    setLogin={setLogin}
+                    setAlert={handleAlert}
+                  />
+                }
               />
             </Routes>
           </div>
         ) : (
           <div>
-            {alert ? (
-              <div className="main-panel-wrapper"> 
-                <h2> Login Successful</h2> 
-              </div>) : null}
             <CreateArea onAdd={addNote} />
             {notes.map((noteItem, index) => {
               return (
@@ -103,7 +125,6 @@ function App() {
             })}
           </div>
         )}
-
         <Footer />
       </div>
     </Router>
@@ -111,7 +132,3 @@ function App() {
 }
 
 export default App;
-
-{
-  /* <Login setToken={setToken} /> */
-}
