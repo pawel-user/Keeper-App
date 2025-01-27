@@ -50,7 +50,7 @@ function App() {
           }
         });
       } else {
-        console.error("Token jest null lub nie istnieje");
+        console.error("Token is null or does not exists");
       }
     }
     return () => (mounted.current = false);

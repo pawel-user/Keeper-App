@@ -11,7 +11,6 @@ async function registerUser(newUserData) {
       { headers: { "Content-Type": "application/json" } }
     );
     // console.log(response.data);
-    return response.data;
   } catch (error) {
     console.error("Registration error: ", error);
     throw error;

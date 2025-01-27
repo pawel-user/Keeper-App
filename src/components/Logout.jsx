@@ -5,11 +5,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 
 async function logoutUser(token) {
   if (!token) {
-    throw new Error("Brak tokena, użytkownik już jest wylogowany.");
+    throw new Error("No token, user is already logged out.");
   }
   try {
     // Dodaj logowanie tokena
-    console.log("Token przed wysłaniem żądania wylogowania:", token); 
+    // console.log("Token przed wysłaniem żądania wylogowania:", token); 
     const response = await axios.post(
       "http://localhost:8080/logout",
       {},
@@ -22,9 +22,10 @@ async function logoutUser(token) {
     );
     return response.data;
   } catch (error) {
-    console.error("Błąd podczas wylogowywania:", error);
+    console.error("Error while logging out:", error);
     throw error;
   }
+  return true;
 }
 
 export default function Logout({ setLogin, setToken }) {
@@ -34,7 +35,7 @@ export default function Logout({ setLogin, setToken }) {
     e.preventDefault();
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("Brak tokena, użytkownik już jest wylogowany.");
+      console.error("No token, user is already logged out.");
       return;
     }
     await logoutUser(token);
@@ -42,6 +43,7 @@ export default function Logout({ setLogin, setToken }) {
     setToken("");
     localStorage.removeItem("token");
     navigate("/");
+    return true;
   };
 
   return (

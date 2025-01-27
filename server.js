@@ -166,10 +166,7 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  // res.send({
-  //   token: "",
-  // });
-  console.log("Logout route called");
+  console.log("Logout route called. User logged out seccessfully.");
   res.status(200).send({ message: "User logged out successfully." });
 });
 

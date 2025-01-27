@@ -3,7 +3,7 @@ import { useState } from 'react';
 export default function useToken() {
   const getToken = () => {
     const token = localStorage.getItem('token');
-    console.log(token);
+    // console.log(token);
     return token || ""; // Zwraca pusty ciąg, jeśli token jest null
   };
 
@@ -31,9 +31,6 @@ export default function useToken() {
     deleteToken,
   };
 }
-
-
-
 
 // import { useState } from "react";
 

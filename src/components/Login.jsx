@@ -31,7 +31,7 @@ export default function Login({ setToken, setLogin, setAlert }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with credentials:", { username, password }); // Dodaj logowanie
+    // console.log("Logging in with credentials:", { username, password }); // Dodaj logowanie
     try {
       const token = await loginUser(
         {
@@ -47,6 +47,7 @@ export default function Login({ setToken, setLogin, setAlert }) {
     } catch (error) {
       // `setAlert` is already called in `loginUser` in case of error
     }
+    return true;
   };
 
   return (

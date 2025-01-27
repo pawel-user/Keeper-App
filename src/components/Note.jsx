@@ -9,7 +9,7 @@ function Note(props) {
 
   const url = `${props.url}`;
 
-  console.log(url);
+  // console.log(url);
 
   return (
     <div className="note">
