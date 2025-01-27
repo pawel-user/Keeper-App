@@ -10,6 +10,7 @@ import Logout from "./Logout";
 import Register from "./Register";
 import useToken from "./useToken";
 import { getUsers } from "../services/registeredUsers.js";
+import { getNotes } from "../services/userNotes.js";
 
 function App() {
   const [alert, setAlert] = useState({
@@ -20,7 +21,7 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
-  const [isLoggedIn, setLogin] = useState(false);
+  const [isLoggedIn, setLogin] = useState(!!token);
   const mounted = useRef(true);
 
   const handleAlert = (type, message) => {
@@ -42,6 +43,15 @@ function App() {
           setUsers(userItems || []);
         }
       });
+      if (token) {
+        getNotes(token).then((userNotes) => {
+          if (mounted.current) {
+            setNotes(userNotes || []);
+          }
+        });
+      } else {
+        console.error("Token jest null lub nie istnieje");
+      }
     }
     return () => (mounted.current = false);
   }, [alert]);
@@ -58,6 +68,21 @@ function App() {
       }, 2000);
     }
   }, [alert]);
+
+  useEffect(() => {
+    async function fetchNotes() {
+      if (token) {
+        const fetchedNotes = await getNotes(token);
+        setNotes(fetchedNotes);
+      }
+    }
+    fetchNotes();
+  }, [token]);
+
+  // Update isLoggedIn when token changes
+  useEffect(() => {
+    setLogin(!!token);
+  }, [token]);
 
   function addNote(newNote) {
     setNotes((prevNotes) => {

@@ -24,6 +24,7 @@ const dbPath = path.join(__dirname, "db.json");
 console.log(dbPath);
 
 let usersData = null;
+let notesData = null;
 
 // Wczytywanie danych użytkowników przy uruchomieniu serwera
 fs.readFile(dbPath, "utf8", (error, data) => {
@@ -31,8 +32,10 @@ fs.readFile(dbPath, "utf8", (error, data) => {
     console.log("Error reading db.json:", error);
   }
   try {
-    usersData = data ? JSON.parse(data).users : [];
-    console.log("Users data loaded once:", usersData); // Logowanie danych tylko raz
+    const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
+    usersData = parsedData.users;
+    notesData = parsedData.notes;
+    console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
   } catch (error) {
     console.log("Error parsing JSON:", error);
   }
@@ -40,34 +43,64 @@ fs.readFile(dbPath, "utf8", (error, data) => {
 
 // Middleware do ustawiania danych użytkowników w req.db
 const setUsersData = (req, res, next) => {
-  req.db = { users: usersData };
+  req.db = { users: usersData, notes: notesData };
   next();
 };
 
 app.use(setUsersData);
 
 app.get("/users", (req, res) => {
-  res.send(req.db);
+  res.send(req.db.users);
+});
+
+// Middleware do uwierzytelniania użytkownika
+const authenticateUser = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  console.log("Token received in authenticateUser:", token); // Logowanie tokena
+  if (!token) {
+    return res.status(401).send("Access denied. No token provided.");
+  }
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    console.log("Decoded token:", decoded); // Logowanie zdekodowanego tokena
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("Error verifying token:", error); // Logowanie błędu
+    res.status(400).send("Invalid token.");
+  }
+};
+
+// Funkcja do pobierania notatek zalogowanego użytkownika
+app.get("/user/notes", authenticateUser, (req, res) => {
+  const userNotes = req.db.notes.filter((note) => note.userId === req.user.id);
+  console.log("userNotes: ", userNotes);
+  res.send(userNotes);
 });
 
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  console.log("Received login data:", { username, password }); // Dodaj logowanie
-  const user = req.db.users.find(
-    (userItem) =>
-      userItem.username === username && userItem.password === password
-  );
-  if (user) {
-    // Generowanie tokena podczas logowania użytkownika
-    const token = jwt.sign(
-      { username: user.username, id: user.id },
-      SECRET_KEY,
-      { expiresIn: "1h" }
+  try {
+    const { username, password } = req.body;
+    console.log("Received login data:", { username, password }); // Dodaj logowanie
+    const user = req.db.users.find(
+      (userItem) =>
+        userItem.username === username && userItem.password === password
     );
-    res.send({ token });
-  } else {
-    console.log("Invalid credentials");
-    res.status(401).json({ error: "Invalid credentials" }); // Zwracanie JSON zamiast tekstu
+    if (user) {
+      // Generowanie tokena podczas logowania użytkownika
+      const token = jwt.sign(
+        { username: user.username, id: user.id },
+        SECRET_KEY,
+        { expiresIn: "1h" }
+      );
+      res.send({ token });
+    } else {
+      console.log("Invalid credentials");
+      res.status(401).json({ error: "Invalid credentials" }); // Zwracanie JSON zamiast tekstu
+    }
+  } catch (error) {
+    console.error("Error in /login route:", error);
+    return res.status(500).send("Internal Server Error");
   }
 });
 
@@ -109,7 +142,7 @@ app.post("/register", (req, res) => {
       username: uploadedUser.username,
       email: uploadedUser.email,
       password: uploadedUser.password,
-      token // Assign generated token
+      token, // Assign generated token
     };
     req.db.users.push(newUser);
 
@@ -132,10 +165,12 @@ app.post("/register", (req, res) => {
   }
 });
 
-app.use("/logout", (req, res) => {
-  res.send({
-    token: "",
-  });
+app.post("/logout", (req, res) => {
+  // res.send({
+  //   token: "",
+  // });
+  console.log("Logout route called");
+  res.status(200).send({ message: "User logged out successfully." });
 });
 
 app.listen(port, () => console.log(`API is running on ${API_URL}`));
