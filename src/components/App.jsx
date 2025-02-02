@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 import Header from "./Header";
 import Footer from "./Footer";
 import Note from "./Note";
@@ -72,12 +73,81 @@ function App() {
   useEffect(() => {
     async function fetchNotes() {
       if (token) {
-        const fetchedNotes = await getNotes(token);
-        setNotes(fetchedNotes);
+        try {
+          // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
+          const decodedToken = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
+
+          if (decodedToken.exp < currentTime) {
+            // Token wygasł
+            setToken(null);
+            setLogin(false);
+            window.location.href = "/";
+          } else {
+            const fetchedNotes = await getNotes(token);
+            if (fetchedNotes.status === 401) {
+              setToken(null);
+              setLogin(false);
+              window.location.href = "/";
+            } else {
+              setNotes(fetchedNotes);
+            }
+          }
+        } catch (error) {
+          console.error("Error decoding token or fetching notes:", error);
+          setToken(null);
+          setLogin(false);
+          window.location.href = "/";
+        }
       }
     }
     fetchNotes();
-  }, [token]);
+  }, [token, setToken]);
+  
+// useEffect(() => {
+//   async function fetchNotes() {
+//     if (token) {
+//       // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
+//       const decodedToken = jwtDecode(token);
+//       const currentTime = Date.now() / 1000;
+
+//       if (decodedToken.exp < currentTime) {
+//         // Token wygasł
+//         setToken(null);
+//         setLogin(false);
+//         window.location.href = "/";
+//       } else {
+//         const fetchedNotes = await getNotes(token);
+//         if (fetchedNotes.status === 401) {
+//           setToken(null);
+//           setLogin(false);
+//           window.location.href = "/";
+//         } else {
+//           setNotes(fetchedNotes);
+//         }
+//       }
+//     }
+//   }
+//   fetchNotes();
+// }, [token, setToken]);
+
+
+  // useEffect(() => {
+  //   async function fetchNotes() {
+  //     if (token) {
+  //       const fetchedNotes = await getNotes(token);
+  //       if (fetchedNotes.status === 401) {
+  //         // Token expired, redirect to home
+  //         setToken(null);
+  //         setLogin(false);
+  //         window.location.href = "/"; // Użycie window.location.href do przekierowania
+  //       } else {
+  //         setNotes(fetchedNotes);
+  //       }
+  //     }
+  //   }
+  //   fetchNotes();
+  // }, [token, setToken]);
 
   // Update isLoggedIn when token changes
   useEffect(() => {

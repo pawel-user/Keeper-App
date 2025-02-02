@@ -67,6 +67,9 @@ const authenticateUser = (req, res, next) => {
     next();
   } catch (error) {
     console.error("Error verifying token:", error); // Logowanie błędu
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).send("Token expired. Please log in again.");
+    }
     res.status(400).send("Invalid token.");
   }
 };
@@ -109,12 +112,6 @@ app.post("/register", (req, res) => {
     const uploadedUser = req.body;
     console.log("New user data received:", uploadedUser);
 
-    const userExists = req.db.users.find(
-      (userItem) =>
-        userItem.username === uploadedUser.username ||
-        userItem.email === uploadedUser.email
-    );
-
     // Walidacja danych użytkownika
     if (
       !uploadedUser.username ||
@@ -131,6 +128,13 @@ app.post("/register", (req, res) => {
       console.log("Invalid email format!");
       return res.status(408).send("Invalid email format");
     }
+
+    // Sprawdzenie czy dany użytkownik już istnieje
+    const userExists = req.db.users.find(
+      (userItem) =>
+        userItem.username === uploadedUser.username ||
+        userItem.email === uploadedUser.email
+    );
 
     if (userExists) {
       console.log("The user with this data already exists!");
@@ -150,7 +154,7 @@ app.post("/register", (req, res) => {
     const token = jwt.sign(
       { username: uploadedUser.username, id: newId },
       SECRET_KEY,
-      { expiresIn: "1m" }
+      { expiresIn: "1h" }
     );
 
     // Nowy użytkownik bez repeatedPassword
@@ -185,6 +189,77 @@ app.post("/register", (req, res) => {
 app.post("/logout", (req, res) => {
   console.log("Logout route called. User logged out seccessfully.");
   res.status(200).send({ message: "User logged out successfully." });
+});
+
+app.post("/add/note", (req, res) => {
+  console.log("/add/note route called.");
+  try {
+    const uploadedNote = req.body;
+    console.log("New note data received:", uploadedNote);
+
+    // Walidacja danych dla notatki użytkownika
+    if (
+      !uploadedNote.section ||
+      !uploadedNote.linkTitle ||
+      !uploadedNote.url ||
+      !uploadedNote.description
+    ) {
+      console.log("Empty fields detected!");
+      return res.status(407).send("All fields are required");
+    }
+
+    // Sprawdzenie czy adres URL jest w poprawnym formacie
+    const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
+    if (!urlRegex.test(uploadedNote.url)) {
+      console.log("Invalid URL format!");
+      return res.status(400).send("Invalid URL format");
+    }
+
+    // Sprawdzenie czy dany adres strony już istnieje w notatkach dla zarejestrowanego użytkownika
+    const noteUrlExists = req.db.notes.find(
+      (noteItem) =>
+        noteItem.url === uploadedNote.url
+    );
+
+    if (noteUrlExists) {
+      console.log("The note with this address URL of website already exists!");
+      return res.status(409).send("Note with the website URL already exists");
+    }
+
+    // Generowanie unikalnego identyfikatora dla nowej notatki dla zarejestrowanego użytkownika
+    const newId =
+      req.db.notes.length > 0
+        ? req.db.notes.reduce((maxId, note) => Math.max(maxId, note.id), 0) + 1
+        : 1;
+
+      // Nowa notatka użytkownika
+      const newNote = {
+        id: newId,
+        userId: req.user.id, // Ustawienie userId jako id zalogowanego użytkownika
+        section: uploadedNote.section,
+        linkTitle: uploadedNote.linkTitle,
+        description: uploadedNote.description
+      };
+      req.db.notes.push(newNote);
+  
+      fs.writeFile(
+        dbPath,
+        JSON.stringify({ users: req.db.users, notes: req.db.notes }, null, 2),
+        (err) => {
+          if (err) {
+            console.error("Error writing to db.json:", err);
+            return res.status(500).send("Internal Server Error");
+          } else {
+            console.log("New user added successfully!");
+            return res.status(201).send("User registered successfully");
+          }
+        }
+      );
+  
+  } catch (error) {
+    console.error("Error in /add/note route:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 });
 
 app.listen(port, () => console.log(`API is running on ${API_URL}`));

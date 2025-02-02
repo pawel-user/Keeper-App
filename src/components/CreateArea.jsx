@@ -25,6 +25,12 @@ function CreateArea(props) {
   }
 
   function submitNote(event) {
+    event.preventDefault();
+    try {
+      return;
+    } catch (error) {
+      return error;
+    }
     props.onAdd(note);
     setNote({
       section: "",
@@ -32,7 +38,6 @@ function CreateArea(props) {
       url: "",
       description: "",
     });
-    event.preventDefault();
   }
 
   function expand() {
