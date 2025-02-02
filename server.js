@@ -115,6 +115,23 @@ app.post("/register", (req, res) => {
         userItem.email === uploadedUser.email
     );
 
+    // Walidacja danych użytkownika
+    if (
+      !uploadedUser.username ||
+      !uploadedUser.email ||
+      !uploadedUser.password
+    ) {
+      console.log("Empty fields detected!");
+      return res.status(407).send("All fields are required");
+    }
+
+    // Sprawdzenie czy email jest w poprawnym formacie
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(uploadedUser.email)) {
+      console.log("Invalid email format!");
+      return res.status(408).send("Invalid email format");
+    }
+
     if (userExists) {
       console.log("The user with this data already exists!");
       return res.status(409).send("User already exists");
@@ -126,14 +143,14 @@ app.post("/register", (req, res) => {
     // Generowanie unikalnego identyfikatora dla nowego zarejestrowanego użytkownika
     const newId =
       req.db.users.length > 0
-        ? req.db.users[req.db.users.length - 1].id + 1
+        ? req.db.users.reduce((maxId, user) => Math.max(maxId, user.id), 0) + 1
         : 1;
 
     // Generate a token
     const token = jwt.sign(
       { username: uploadedUser.username, id: newId },
       SECRET_KEY,
-      { expiresIn: "1h" }
+      { expiresIn: "1m" }
     );
 
     // Nowy użytkownik bez repeatedPassword
@@ -148,7 +165,7 @@ app.post("/register", (req, res) => {
 
     fs.writeFile(
       dbPath,
-      JSON.stringify({ users: req.db.users }, null, 2),
+      JSON.stringify({ users: req.db.users, notes: req.db.notes }, null, 2),
       (err) => {
         if (err) {
           console.error("Error writing to db.json:", err);
