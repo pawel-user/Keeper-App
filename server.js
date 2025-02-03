@@ -70,6 +70,7 @@ const authenticateUser = (req, res, next) => {
     if (error.name === "TokenExpiredError") {
       return res.status(401).send("Token expired. Please log in again.");
     }
+    console.log("Invalid token.");
     res.status(400).send("Invalid token.");
   }
 };
@@ -191,32 +192,34 @@ app.post("/logout", (req, res) => {
   res.status(200).send({ message: "User logged out successfully." });
 });
 
-app.post("/add/note", (req, res) => {
+app.post("/add/note", authenticateUser, (req, res) => {
   console.log("/add/note route called.");
   try {
     const uploadedNote = req.body;
     console.log("New note data received:", uploadedNote);
 
     // Walidacja danych dla notatki użytkownika
-    if (
-      !uploadedNote.section ||
-      !uploadedNote.linkTitle ||
-      !uploadedNote.url ||
-      !uploadedNote.description
-    ) {
-      console.log("Empty fields detected!");
-      return res.status(407).send("All fields are required");
-    }
+    // if (
+    //   !uploadedNote.section ||
+    //   !uploadedNote.linkTitle ||
+    //   !uploadedNote.url ||
+    //   !uploadedNote.description
+    // ) {
+    //   console.log("Empty fields detected!");
+    //   return res.status(407).send("All fields are required");
+    // }
 
     // Sprawdzenie czy adres URL jest w poprawnym formacie
-    const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
-    if (!urlRegex.test(uploadedNote.url)) {
-      console.log("Invalid URL format!");
-      return res.status(400).send("Invalid URL format");
-    }
+    // const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
+    // if (!urlRegex.test(uploadedNote.url)) {
+    //   console.log("Invalid URL format!");
+    //   return res.status(400).send("Invalid URL format");
+    // }
+
+    const userNotes = req.db.notes.filter((note) => note.userId === req.user.id);
 
     // Sprawdzenie czy dany adres strony już istnieje w notatkach dla zarejestrowanego użytkownika
-    const noteUrlExists = req.db.notes.find(
+    const noteUrlExists = userNotes.find(
       (noteItem) =>
         noteItem.url === uploadedNote.url
     );
@@ -238,6 +241,7 @@ app.post("/add/note", (req, res) => {
         userId: req.user.id, // Ustawienie userId jako id zalogowanego użytkownika
         section: uploadedNote.section,
         linkTitle: uploadedNote.linkTitle,
+        url: uploadedNote.url,
         description: uploadedNote.description
       };
       req.db.notes.push(newNote);
@@ -250,8 +254,8 @@ app.post("/add/note", (req, res) => {
             console.error("Error writing to db.json:", err);
             return res.status(500).send("Internal Server Error");
           } else {
-            console.log("New user added successfully!");
-            return res.status(201).send("User registered successfully");
+            console.log("New note added successfully!");
+            return res.status(201).send("Adding new note was successful.");
           }
         }
       );

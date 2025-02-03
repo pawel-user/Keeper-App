@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Header from "./Header";
 import Footer from "./Footer";
 import Note from "./Note";
@@ -18,19 +18,29 @@ function App() {
     type: "",
     message: "",
     visible: false,
+    // reload: false, // Dodanie flagi do wymuszenia przeładowania
   });
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
   const [isLoggedIn, setLogin] = useState(!!token);
   const mounted = useRef(true);
+  const fetchNotesCalled = useRef(false);
 
   const handleAlert = (type, message) => {
     setAlert({
       type,
       message,
       visible: true,
+      // reload: type === "noteAdded", // Ustawienie flagi, gdy nowa notatka zostanie dodana  
     });
+    if (type === "noteAdded") {
+      setTimeout(reloadPage, 2000); // Wywołanie funkcji reloadPage z opóźnieniem 2 sekund
+  };
+}
+
+  const reloadPage = () => {
+    window.location.reload(); // Wymuszenie przeładowania strony
   };
 
   useEffect(() => {
@@ -72,6 +82,7 @@ function App() {
 
   useEffect(() => {
     async function fetchNotes() {
+      console.log("fetchNotes function called");
       if (token) {
         try {
           // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
@@ -101,36 +112,39 @@ function App() {
         }
       }
     }
-    fetchNotes();
-  }, [token, setToken]);
-  
-// useEffect(() => {
-//   async function fetchNotes() {
-//     if (token) {
-//       // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
-//       const decodedToken = jwtDecode(token);
-//       const currentTime = Date.now() / 1000;
 
-//       if (decodedToken.exp < currentTime) {
-//         // Token wygasł
-//         setToken(null);
-//         setLogin(false);
-//         window.location.href = "/";
-//       } else {
-//         const fetchedNotes = await getNotes(token);
-//         if (fetchedNotes.status === 401) {
-//           setToken(null);
-//           setLogin(false);
-//           window.location.href = "/";
-//         } else {
-//           setNotes(fetchedNotes);
-//         }
-//       }
-//     }
-//   }
-//   fetchNotes();
-// }, [token, setToken]);
+    if (isLoggedIn && token && !fetchNotesCalled.current) {
+      fetchNotesCalled.current = true;
+      fetchNotes();
+    }
+  }, [isLoggedIn, token, setToken]);
 
+  // useEffect(() => {
+  //   async function fetchNotes() {
+  //     if (token) {
+  //       // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
+  //       const decodedToken = jwtDecode(token);
+  //       const currentTime = Date.now() / 1000;
+
+  //       if (decodedToken.exp < currentTime) {
+  //         // Token wygasł
+  //         setToken(null);
+  //         setLogin(false);
+  //         window.location.href = "/";
+  //       } else {
+  //         const fetchedNotes = await getNotes(token);
+  //         if (fetchedNotes.status === 401) {
+  //           setToken(null);
+  //           setLogin(false);
+  //           window.location.href = "/";
+  //         } else {
+  //           setNotes(fetchedNotes);
+  //         }
+  //       }
+  //     }
+  //   }
+  //   fetchNotes();
+  // }, [token, setToken]);
 
   // useEffect(() => {
   //   async function fetchNotes() {
@@ -154,11 +168,21 @@ function App() {
     setLogin(!!token);
   }, [token]);
 
-  function addNote(newNote) {
-    setNotes((prevNotes) => {
-      return [...prevNotes, newNote];
-    });
-  }
+
+  // Funkcja addNote
+function addNote(newNote) {
+  setNotes((prevNotes) => {
+    const updatedNotes = [...prevNotes, newNote];
+    localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
+    handleAlert("noteAdded", "New note added successfully!"); // Wywołanie alertu z flagą reload
+    return updatedNotes;
+  });
+}
+  // function addNote(newNote) {
+  //   setNotes((prevNotes) => {
+  //     return [...prevNotes, newNote];
+  //   });
+  // }
 
   function deleteNote(id) {
     setNotes((prevNotes) => {
@@ -204,7 +228,7 @@ function App() {
           </div>
         ) : (
           <div>
-            <CreateArea onAdd={addNote} />
+            <CreateArea onAdd={addNote} setAlert={handleAlert} />
             {notes.map((noteItem, index) => {
               return (
                 <Note
