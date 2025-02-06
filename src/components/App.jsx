@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import Header from "./Header";
 import Footer from "./Footer";
 import Note from "./Note";
@@ -10,25 +11,36 @@ import Logout from "./Logout";
 import Register from "./Register";
 import useToken from "./useToken";
 import { getUsers } from "../services/registeredUsers.js";
+import { getNotes } from "../services/userNotes.js";
 
 function App() {
   const [alert, setAlert] = useState({
     type: "",
     message: "",
     visible: false,
+    // reload: false, // Dodanie flagi do wymuszenia przeładowania
   });
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
-  const [isLoggedIn, setLogin] = useState(false);
+  const [isLoggedIn, setLogin] = useState(!!token);
   const mounted = useRef(true);
+  const fetchNotesCalled = useRef(false);
 
   const handleAlert = (type, message) => {
     setAlert({
       type,
       message,
       visible: true,
+      // reload: type === "noteAdded", // Ustawienie flagi, gdy nowa notatka zostanie dodana  
     });
+    if (type === "noteAdded") {
+      setTimeout(reloadPage, 2000); // Wywołanie funkcji reloadPage z opóźnieniem 2 sekund
+  };
+}
+
+  const reloadPage = () => {
+    window.location.reload(); // Wymuszenie przeładowania strony
   };
 
   useEffect(() => {
@@ -42,6 +54,15 @@ function App() {
           setUsers(userItems || []);
         }
       });
+      if (token) {
+        getNotes(token).then((userNotes) => {
+          if (mounted.current) {
+            setNotes(userNotes || []);
+          }
+        });
+      } else {
+        console.error("Token is null or does not exists");
+      }
     }
     return () => (mounted.current = false);
   }, [alert]);
@@ -59,11 +80,109 @@ function App() {
     }
   }, [alert]);
 
-  function addNote(newNote) {
-    setNotes((prevNotes) => {
-      return [...prevNotes, newNote];
-    });
-  }
+  useEffect(() => {
+    async function fetchNotes() {
+      console.log("fetchNotes function called");
+      if (token) {
+        try {
+          // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
+          const decodedToken = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
+
+          if (decodedToken.exp < currentTime) {
+            // Token wygasł
+            setToken(null);
+            setLogin(false);
+            window.location.href = "/";
+          } else {
+            const fetchedNotes = await getNotes(token);
+            if (fetchedNotes.status === 401) {
+              setToken(null);
+              setLogin(false);
+              window.location.href = "/";
+            } else {
+              setNotes(fetchedNotes);
+            }
+          }
+        } catch (error) {
+          console.error("Error decoding token or fetching notes:", error);
+          setToken(null);
+          setLogin(false);
+          window.location.href = "/";
+        }
+      }
+    }
+
+    if (isLoggedIn && token && !fetchNotesCalled.current) {
+      fetchNotesCalled.current = true;
+      fetchNotes();
+    }
+  }, [isLoggedIn, token, setToken]);
+
+  // useEffect(() => {
+  //   async function fetchNotes() {
+  //     if (token) {
+  //       // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
+  //       const decodedToken = jwtDecode(token);
+  //       const currentTime = Date.now() / 1000;
+
+  //       if (decodedToken.exp < currentTime) {
+  //         // Token wygasł
+  //         setToken(null);
+  //         setLogin(false);
+  //         window.location.href = "/";
+  //       } else {
+  //         const fetchedNotes = await getNotes(token);
+  //         if (fetchedNotes.status === 401) {
+  //           setToken(null);
+  //           setLogin(false);
+  //           window.location.href = "/";
+  //         } else {
+  //           setNotes(fetchedNotes);
+  //         }
+  //       }
+  //     }
+  //   }
+  //   fetchNotes();
+  // }, [token, setToken]);
+
+  // useEffect(() => {
+  //   async function fetchNotes() {
+  //     if (token) {
+  //       const fetchedNotes = await getNotes(token);
+  //       if (fetchedNotes.status === 401) {
+  //         // Token expired, redirect to home
+  //         setToken(null);
+  //         setLogin(false);
+  //         window.location.href = "/"; // Użycie window.location.href do przekierowania
+  //       } else {
+  //         setNotes(fetchedNotes);
+  //       }
+  //     }
+  //   }
+  //   fetchNotes();
+  // }, [token, setToken]);
+
+  // Update isLoggedIn when token changes
+  useEffect(() => {
+    setLogin(!!token);
+  }, [token]);
+
+
+  // Funkcja addNote
+function addNote(newNote) {
+  setNotes((prevNotes) => {
+    const updatedNotes = [...prevNotes, newNote];
+    localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
+    handleAlert("noteAdded", "New note added successfully!"); // Wywołanie alertu z flagą reload
+    return updatedNotes;
+  });
+}
+  // function addNote(newNote) {
+  //   setNotes((prevNotes) => {
+  //     return [...prevNotes, newNote];
+  //   });
+  // }
 
   function deleteNote(id) {
     setNotes((prevNotes) => {
@@ -80,6 +199,7 @@ function App() {
           isLoggedIn={isLoggedIn}
           setToken={setToken}
           setLogin={setLogin}
+          setAlert={handleAlert}
         />
         {alert.visible ? (
           <div className="main-panel-wrapper">
@@ -109,7 +229,7 @@ function App() {
           </div>
         ) : (
           <div>
-            <CreateArea onAdd={addNote} />
+            <CreateArea onAdd={addNote} setAlert={handleAlert} />
             {notes.map((noteItem, index) => {
               return (
                 <Note

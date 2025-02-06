@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { addUser } from "../services/registeredUsers";
+// import { addUser } from "../services/registeredUsers";
 
 async function registerUser(newUserData) {
   try {
@@ -10,8 +10,8 @@ async function registerUser(newUserData) {
       newUserData,
       { headers: { "Content-Type": "application/json" } }
     );
+    return response;
     // console.log(response.data);
-    return response.data;
   } catch (error) {
     console.error("Registration error: ", error);
     throw error;
@@ -39,13 +39,12 @@ export default function Register({ setAlert }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(userInput);
     console.log("Submitting registration form with data:", userInput);
     try {
       const response = await registerUser(userInput);
       if (response) {
         // Wywołanie asynchronicznej funkcji addUser(), aby zapisać nowego użytkownika do pliku JSON
-        await addUser(userInput);
+        // await addUser(userInput);
         setAlert("register", "Registration successful!");
         // Opóźnienie na 3 sekundy przed nawigacją do innej strony
         setTimeout(() => {
@@ -59,6 +58,13 @@ export default function Register({ setAlert }) {
           "error",
           "This user already exists! Try login or enter other data to register"
         );
+      } else if (error.response && error.response.status === 407) {
+        setAlert(
+          "error",
+          "Empty fields detected! All input fields are required."
+        );
+      } else if (error.response && error.response.status === 408) {
+        setAlert("error", "Invalid email format! Please try again.");
       } else {
         setAlert(
           "error",

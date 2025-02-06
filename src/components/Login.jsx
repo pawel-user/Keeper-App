@@ -15,6 +15,8 @@ async function loginUser(credentials, setAlert) {
     console.error("Error logging in:", error);
     if (error.response && error.response.status === 401) {
       setAlert("error", "Login Failed. Invalid credentials.");
+    } else if (error.response && error.response.status === 500) {
+      setAlert("error", "Login Failed. Internal Server Error!.");
     } else {
       setAlert("error", "Login Failed. Please try again later.");
     }
@@ -29,7 +31,7 @@ export default function Login({ setToken, setLogin, setAlert }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with credentials:", { username, password }); // Dodaj logowanie    
+    // console.log("Logging in with credentials:", { username, password }); // Dodaj logowanie
     try {
       const token = await loginUser(
         {
@@ -45,6 +47,7 @@ export default function Login({ setToken, setLogin, setAlert }) {
     } catch (error) {
       // `setAlert` is already called in `loginUser` in case of error
     }
+    return true;
   };
 
   return (
@@ -77,6 +80,6 @@ export default function Login({ setToken, setLogin, setAlert }) {
 
 Login.propTypes = {
   setToken: propTypes.func.isRequired,
-  setLogin: propTypes.func.isRequired, 
+  setLogin: propTypes.func.isRequired,
   setAlert: propTypes.func.isRequired,
 };

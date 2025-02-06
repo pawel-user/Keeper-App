@@ -1,7 +1,28 @@
 import React, { useState } from "react";
+import axios from "axios";
 import AddIcon from "@mui/icons-material/Add";
 import { Fab } from "@mui/material";
 import { Zoom } from "@mui/material";
+
+async function addNote(newNote) {
+  try {
+    const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
+    const response = await axios.post(
+      "http://localhost:8080/add/note",
+      newNote,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Adding new note error: ", error);
+    throw error;
+  }
+}
 
 function CreateArea(props) {
   const [isExpanded, setExpanded] = useState(false);
@@ -24,15 +45,60 @@ function CreateArea(props) {
     });
   }
 
-  function submitNote(event) {
-    props.onAdd(note);
-    setNote({
-      section: "",
-      linkTitle: "",
-      url: "",
-      description: "",
-    });
+  async function submitNote(event) {
     event.preventDefault();
+    // Sprawdzenie, czy wszystkie pola są wypełnione
+    if (!note.section || !note.linkTitle || !note.url || !note.description) {
+      props.setAlert(
+        "error",
+        "Empty fields detected! All input fields are required."
+      );
+      return;
+    }
+
+    // Sprawdzenie czy adres URL jest w poprawnym formacie
+    const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
+    console.log(urlRegex);
+    if (!urlRegex.test(note.url)) {
+      props.setAlert(
+        "error",
+        "Invalid the website URL format! Please try again."
+      );
+      return;
+    }
+
+    try {
+      const response = await addNote(note);
+      if (response.status === 409) {
+        props.setAlert("error", "Note with the website URL already exists!");
+        return;
+      }
+      if (response) {
+        // props.setAlert("noteAdded", "New note added successfully.");
+        props.onAdd(note);
+        setNote({
+          section: "",
+          linkTitle: "",
+          url: "",
+          description: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error while adding new user note:", error);
+      // if (error.response && error.response.status === 409) {
+      //   props.setAlert(
+      //     "error",
+      //     "Note with the website URL already exists!"
+      //   );
+      // } else if (error.response && error.response.status === 407) {
+      //   props.setAlert(
+      //     "error",
+      //     "Empty fields detected! All input fields are required."
+      //   );
+      // } else if (error.response && error.response.status === 400) {
+      //   props.setAlert("error", "Invalid the website URL format! Please try again.");
+      // }
+    }
   }
 
   function expand() {
@@ -68,7 +134,7 @@ function CreateArea(props) {
             placeholder="Title of the website link"
           />
         ) : null}
-        
+
         <textarea
           name="description"
           onClick={expand}
