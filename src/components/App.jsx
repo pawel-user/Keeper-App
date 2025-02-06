@@ -18,7 +18,6 @@ function App() {
     type: "",
     message: "",
     visible: false,
-    // reload: false, // Dodanie flagi do wymuszenia przeładowania
   });
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
@@ -32,7 +31,6 @@ function App() {
       type,
       message,
       visible: true,
-      // reload: type === "noteAdded", // Ustawienie flagi, gdy nowa notatka zostanie dodana  
     });
     if (type === "noteAdded") {
       setTimeout(reloadPage, 2000); // Wywołanie funkcji reloadPage z opóźnieniem 2 sekund
@@ -119,50 +117,6 @@ function App() {
     }
   }, [isLoggedIn, token, setToken]);
 
-  // useEffect(() => {
-  //   async function fetchNotes() {
-  //     if (token) {
-  //       // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
-  //       const decodedToken = jwtDecode(token);
-  //       const currentTime = Date.now() / 1000;
-
-  //       if (decodedToken.exp < currentTime) {
-  //         // Token wygasł
-  //         setToken(null);
-  //         setLogin(false);
-  //         window.location.href = "/";
-  //       } else {
-  //         const fetchedNotes = await getNotes(token);
-  //         if (fetchedNotes.status === 401) {
-  //           setToken(null);
-  //           setLogin(false);
-  //           window.location.href = "/";
-  //         } else {
-  //           setNotes(fetchedNotes);
-  //         }
-  //       }
-  //     }
-  //   }
-  //   fetchNotes();
-  // }, [token, setToken]);
-
-  // useEffect(() => {
-  //   async function fetchNotes() {
-  //     if (token) {
-  //       const fetchedNotes = await getNotes(token);
-  //       if (fetchedNotes.status === 401) {
-  //         // Token expired, redirect to home
-  //         setToken(null);
-  //         setLogin(false);
-  //         window.location.href = "/"; // Użycie window.location.href do przekierowania
-  //       } else {
-  //         setNotes(fetchedNotes);
-  //       }
-  //     }
-  //   }
-  //   fetchNotes();
-  // }, [token, setToken]);
-
   // Update isLoggedIn when token changes
   useEffect(() => {
     setLogin(!!token);
@@ -178,11 +132,6 @@ function addNote(newNote) {
     return updatedNotes;
   });
 }
-  // function addNote(newNote) {
-  //   setNotes((prevNotes) => {
-  //     return [...prevNotes, newNote];
-  //   });
-  // }
 
   function deleteNote(id) {
     setNotes((prevNotes) => {

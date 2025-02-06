@@ -85,19 +85,6 @@ function CreateArea(props) {
       }
     } catch (error) {
       console.error("Error while adding new user note:", error);
-      // if (error.response && error.response.status === 409) {
-      //   props.setAlert(
-      //     "error",
-      //     "Note with the website URL already exists!"
-      //   );
-      // } else if (error.response && error.response.status === 407) {
-      //   props.setAlert(
-      //     "error",
-      //     "Empty fields detected! All input fields are required."
-      //   );
-      // } else if (error.response && error.response.status === 400) {
-      //   props.setAlert("error", "Invalid the website URL format! Please try again.");
-      // }
     }
   }
 

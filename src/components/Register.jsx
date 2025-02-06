@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-// import { addUser } from "../services/registeredUsers";
 
 async function registerUser(newUserData) {
   try {
@@ -11,7 +10,6 @@ async function registerUser(newUserData) {
       { headers: { "Content-Type": "application/json" } }
     );
     return response;
-    // console.log(response.data);
   } catch (error) {
     console.error("Registration error: ", error);
     throw error;
@@ -19,8 +17,6 @@ async function registerUser(newUserData) {
 }
 
 export default function Register({ setAlert }) {
-  // console.log("Users inside Register component:", users); // Logowanie users
-
   const [userInput, setUserInput] = useState({
     username: "",
     email: "",
@@ -39,14 +35,11 @@ export default function Register({ setAlert }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting registration form with data:", userInput);
     try {
       const response = await registerUser(userInput);
       if (response) {
-        // Wywołanie asynchronicznej funkcji addUser(), aby zapisać nowego użytkownika do pliku JSON
-        // await addUser(userInput);
         setAlert("register", "Registration successful!");
-        // Opóźnienie na 3 sekundy przed nawigacją do innej strony
+        // Opóźnienie na 2 sekundy przed nawigacją do innej strony
         setTimeout(() => {
           navigate("/");
         }, 2000); // 2000 milisekund = 2 sekundy

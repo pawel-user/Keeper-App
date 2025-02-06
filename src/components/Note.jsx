@@ -9,8 +9,6 @@ function Note(props) {
 
   const url = `${props.url}`;
 
-  // console.log(url);
-
   return (
     <div className="note">
       <h1>{props.section}</h1>

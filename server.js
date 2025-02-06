@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, "db.json");
-console.log(dbPath);
+// console.log(dbPath);
 
 let usersData = null;
 let notesData = null;
@@ -35,7 +35,7 @@ fs.readFile(dbPath, "utf8", (error, data) => {
     const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
     usersData = parsedData.users;
     notesData = parsedData.notes;
-    console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
+    // console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
   } catch (error) {
     console.log("Error parsing JSON:", error);
   }
@@ -56,13 +56,13 @@ app.get("/users", (req, res) => {
 // Middleware do uwierzytelniania użytkownika
 const authenticateUser = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
-  console.log("Token received in authenticateUser:", token); // Logowanie tokena
+  // console.log("Token received in authenticateUser:", token); // Logowanie tokena
   if (!token) {
     return res.status(401).send("Access denied. No token provided.");
   }
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
-    console.log("Decoded token:", decoded); // Logowanie zdekodowanego tokena
+    // console.log("Decoded token:", decoded); // Logowanie zdekodowanego tokena
     req.user = decoded;
     next();
   } catch (error) {
@@ -78,14 +78,14 @@ const authenticateUser = (req, res, next) => {
 // Funkcja do pobierania notatek zalogowanego użytkownika
 app.get("/user/notes", authenticateUser, (req, res) => {
   const userNotes = req.db.notes.filter((note) => note.userId === req.user.id);
-  console.log("userNotes: ", userNotes);
+  // console.log("userNotes: ", userNotes);
   res.send(userNotes);
 });
 
 app.post("/login", (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log("Received login data:", { username, password }); // Dodaj logowanie
+    // console.log("Received login data:", { username, password }); // Dodaj logowanie
     const user = req.db.users.find(
       (userItem) =>
         userItem.username === username && userItem.password === password
@@ -111,7 +111,7 @@ app.post("/login", (req, res) => {
 app.post("/register", (req, res) => {
   try {
     const uploadedUser = req.body;
-    console.log("New user data received:", uploadedUser);
+    // console.log("New user data received:", uploadedUser);
 
     // Walidacja danych użytkownika
     if (
@@ -187,11 +187,6 @@ app.post("/register", (req, res) => {
   }
 });
 
-app.post("/logout", (req, res) => {
-  console.log("Logout route called. User logged out seccessfully.");
-  res.status(200).send({ message: "User logged out successfully." });
-});
-
 app.post("/add/note", authenticateUser, (req, res) => {
   console.log("/add/note route called.");
   try {
@@ -264,6 +259,11 @@ app.post("/add/note", authenticateUser, (req, res) => {
     console.error("Error in /add/note route:", error);
     return res.status(500).send("Internal Server Error");
   }
+});
+
+app.post("/logout", (req, res) => {
+  console.log("Logout route called. User logged out seccessfully.");
+  res.status(200).send({ message: "User logged out successfully." });
 });
 
 app.listen(port, () => console.log(`API is running on ${API_URL}`));

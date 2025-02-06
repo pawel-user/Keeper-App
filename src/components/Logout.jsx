@@ -8,8 +8,6 @@ async function logoutUser(token) {
     throw new Error("No token, user is already logged out.");
   }
   try {
-    // Dodaj logowanie tokena
-    // console.log("Token przed wysłaniem żądania wylogowania:", token); 
     const response = await axios.post(
       "http://localhost:8080/logout",
       {},
