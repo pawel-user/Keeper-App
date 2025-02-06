@@ -199,6 +199,7 @@ function addNote(newNote) {
           isLoggedIn={isLoggedIn}
           setToken={setToken}
           setLogin={setLogin}
+          setAlert={handleAlert}
         />
         {alert.visible ? (
           <div className="main-panel-wrapper">

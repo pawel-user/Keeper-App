@@ -28,7 +28,7 @@ async function logoutUser(token) {
   return true;
 }
 
-export default function Logout({ setLogin, setToken }) {
+export default function Logout(props) {
   const navigate = useNavigate();
 
   const handleLogout = async (e) => {
@@ -39,9 +39,10 @@ export default function Logout({ setLogin, setToken }) {
       return;
     }
     await logoutUser(token);
-    setLogin(false);
-    setToken("");
+    props.setLogin(false);
+    props.setToken("");
     localStorage.removeItem("token");
+    props.setAlert("logout", "Logout successful");
     navigate("/");
     return true;
   };
