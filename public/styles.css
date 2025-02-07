@@ -129,3 +129,12 @@ form.create-note button {
   align-items: center; /* Środek pionowo */
   text-align: center;
 }
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.clear-button {
+  margin-left: auto;
+}

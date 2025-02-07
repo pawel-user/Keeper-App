@@ -1,28 +1,29 @@
 import React, { useState } from "react";
-import axios from "axios";
+import {addNote} from "../services/userNotes.js";
 import AddIcon from "@mui/icons-material/Add";
-import { Fab } from "@mui/material";
 import { Zoom } from "@mui/material";
+import { Fab } from "@mui/material";
+// import axios from "axios";
 
-async function addNote(newNote) {
-  try {
-    const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
-    const response = await axios.post(
-      "http://localhost:8080/add/note",
-      newNote,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
-        },
-      }
-    );
-    return response;
-  } catch (error) {
-    console.error("Adding new note error: ", error);
-    throw error;
-  }
-}
+// async function addNote(newNote) {
+//   try {
+//     const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
+//     const response = await axios.post(
+//       "http://localhost:8080/add/note",
+//       newNote,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
+//         },
+//       }
+//     );
+//     return response;
+//   } catch (error) {
+//     console.error("Adding new note error: ", error);
+//     throw error;
+//   }
+// }
 
 function CreateArea(props) {
   const [isExpanded, setExpanded] = useState(false);
@@ -58,7 +59,6 @@ function CreateArea(props) {
 
     // Sprawdzenie czy adres URL jest w poprawnym formacie
     const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
-    console.log(urlRegex);
     if (!urlRegex.test(note.url)) {
       props.setAlert(
         "error",

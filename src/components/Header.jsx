@@ -3,14 +3,14 @@ import Logout from "./Logout";
 
 import HighlightIcon from "@mui/icons-material/Highlight";
 
-function Header({isLoggedIn, setLogin, setToken, setAlert}) {
+function Header(props) {
 
   return (
     <header>
       <h1>
         <HighlightIcon/> Keeper
       </h1>
-        {isLoggedIn ? <Logout setLogin={setLogin} setToken={setToken} setAlert={setAlert}/> : null}
+        {props.isLoggedIn ? <Logout setLogin={props.setLogin} setToken={props.setToken} setAlert={props.setAlert}/> : null}
     </header>
   );
 }

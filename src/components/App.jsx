@@ -7,7 +7,6 @@ import Note from "./Note";
 import CreateArea from "./CreateArea";
 import Welcome from "./Welcome";
 import Login from "./Login";
-import Logout from "./Logout";
 import Register from "./Register";
 import useToken from "./useToken";
 import { getUsers } from "../services/registeredUsers.js";
@@ -80,7 +79,6 @@ function App() {
 
   useEffect(() => {
     async function fetchNotes() {
-      console.log("fetchNotes function called");
       if (token) {
         try {
           // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
@@ -128,7 +126,7 @@ function addNote(newNote) {
   setNotes((prevNotes) => {
     const updatedNotes = [...prevNotes, newNote];
     localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
-    handleAlert("noteAdded", "New note added successfully!"); // Wywołanie alertu z flagą reload
+    handleAlert("noteAdded", "New note added successfully!"); 
     return updatedNotes;
   });
 }

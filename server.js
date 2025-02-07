@@ -112,6 +112,7 @@ app.post("/register", (req, res) => {
   try {
     const uploadedUser = req.body;
     // console.log("New user data received:", uploadedUser);
+    // console.log(!uploadedUser.username);
 
     // Walidacja danych użytkownika
     if (
@@ -120,14 +121,14 @@ app.post("/register", (req, res) => {
       !uploadedUser.password
     ) {
       console.log("Empty fields detected!");
-      return res.status(407).send("All fields are required");
+      return res.status(400).send("All fields are required");
     }
 
     // Sprawdzenie czy email jest w poprawnym formacie
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(uploadedUser.email)) {
-      console.log("Invalid email format!");
-      return res.status(408).send("Invalid email format");
+      // console.log("Invalid email format!");
+      return res.status(400).send("Invalid email format");
     }
 
     // Sprawdzenie czy dany użytkownik już istnieje
@@ -188,7 +189,6 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/add/note", authenticateUser, (req, res) => {
-  console.log("/add/note route called.");
   try {
     const uploadedNote = req.body;
     console.log("New note data received:", uploadedNote);
@@ -262,7 +262,7 @@ app.post("/add/note", authenticateUser, (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  console.log("Logout route called. User logged out seccessfully.");
+  console.log("User logged out seccessfully.");
   res.status(200).send({ message: "User logged out successfully." });
 });
 

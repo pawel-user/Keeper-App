@@ -13,6 +13,21 @@ export async function getUsers() {
   }
 }
 
+export async function registerUser(newUserData) {
+  try {
+    const response = await axios.post(
+      API_URL + "/register",
+      newUserData,
+      { headers: { "Content-Type": "application/json" } }
+    );
+    return response;
+  } catch (error) {
+    console.error("Registration error: ", error);
+    throw error;
+  }
+}
+
+
 //Funkcja dodawania nowego użytkownika
 // export async function addUser(newUser) {
 //   try {

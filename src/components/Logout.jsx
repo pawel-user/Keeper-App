@@ -1,30 +1,31 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import {logoutUser} from "../services/loggedUsers.js";
 import LogoutIcon from "@mui/icons-material/Logout";
+// import axios from "axios";
 
-async function logoutUser(token) {
-  if (!token) {
-    throw new Error("No token, user is already logged out.");
-  }
-  try {
-    const response = await axios.post(
-      "http://localhost:8080/logout",
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error while logging out:", error);
-    throw error;
-  }
-  return true;
-}
+
+// async function logoutUser(token) {
+//   if (!token) {
+//     throw new Error("No token, user is already logged out.");
+//   }
+//   try {
+//     const response = await axios.post(
+//       "http://localhost:8080/logout",
+//       {},
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error while logging out:", error);
+//     throw error;
+//   }
+// }
 
 export default function Logout(props) {
   const navigate = useNavigate();
