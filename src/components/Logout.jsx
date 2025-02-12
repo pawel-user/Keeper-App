@@ -40,6 +40,8 @@ export default function Logout(props) {
     await logoutUser(token);
     props.setLogin(false);
     props.setToken("");
+    props.setIsEditing(false); // Resetowanie stanu isEditing
+    props.setNoteToEdit(null); // Resetowanie edytowanej notatki
     localStorage.removeItem("token");
     props.setAlert("logout", "Logout successful");
     navigate("/");

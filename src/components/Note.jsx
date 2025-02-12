@@ -1,9 +1,19 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 function Note(props) {
+  const navigate = useNavigate();
+  
+  function handleEditClick(event) {
+    navigate("/note/edit");
 
-  function handleClick() {
+    event.preventDefault();
+
+    props.onEdit(props.id);
+  }
+  function handleDeleteClick() {
     props.onDelete(props.id);
   }
 
@@ -14,9 +24,19 @@ function Note(props) {
       <h1>{props.section}</h1>
       <a href={url}>{props.linkTitle}</a>
       <p>{props.description}</p>
-      <button onClick={handleClick}>
+      <button onClick={handleDeleteClick}>
         <DeleteIcon />
       </button>
+      <Link
+        component={Link}
+        to="/note/edit"
+        style={{ textDecoration: "none", color: "inherit" }}
+        onClick={handleEditClick}
+      >
+        <button onClick={handleEditClick}>
+          <EditNoteIcon />
+        </button>
+      </Link>
     </div>
   );
 }

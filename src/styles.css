@@ -70,13 +70,15 @@ footer p {
 
 form.create-note {
   position: relative;
-  width: 480px;
+  width: 100%;
+  max-width: 480px;
   margin: 30px auto 20px auto;
   background: #fff;
   padding: 15px;
   border-radius: 7px;
   box-shadow: 0 1px 5px rgb(138, 137, 137);
 }
+
 form.create-note input,
 form.create-note textarea {
   width: 100%;
@@ -87,10 +89,8 @@ form.create-note textarea {
   font-family: inherit;
   resize: none;
 }
+
 form.create-note button {
-  position: absolute;
-  right: 18px;
-  bottom: -18px;
   background: #f5ba13;
   color: #fff;
   border: none;
@@ -137,4 +137,13 @@ form.create-note button {
 
 .clear-button {
   margin-left: auto;
+}
+
+.fab-buttons-container {
+  display: flex;
+  justify-content: space-between; /* Równomierne rozmieszczenie przycisków */
+  position: absolute;
+  right: 18px;
+  bottom: -18px;
+  width: 80px; /* Możesz dostosować szerokość, aby zmieścić przyciski obok siebie */
 }
