@@ -147,3 +147,12 @@ form.create-note button {
   bottom: -18px;
   width: 80px; /* Możesz dostosować szerokość, aby zmieścić przyciski obok siebie */
 }
+
+.fab-buttons-container2 {
+  display: flex;
+  justify-content: space-between; /* Równomierne rozmieszczenie przycisków */
+  position: absolute;
+  right: 18px;
+  bottom: -18px;
+}
+

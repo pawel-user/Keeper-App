@@ -1,11 +1,4 @@
-.fab-buttons-container {
-    display: flex;
-    justify-content: space-between; /* Ustawia przyciski po przeciwnych stronach */
-    align-items: center; /* Wyrównanie przycisków do środka */
-    width: 100%; /* Szerokość kontenera przycisków */
-    margin-top: 10px; /* Odstęp od textarea */
-  }
-  
+
   .fab-edit-button,
   .fab-clear-button {
     font-size: 16px; /* Rozmiar czcionki */

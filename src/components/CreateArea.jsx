@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {addNote} from "../services/userNotes.js";
+import { addNote } from "../services/userNotes.js";
 import AddIcon from "@mui/icons-material/Add";
 import { Zoom } from "@mui/material";
 import { Fab } from "@mui/material";
@@ -130,11 +130,13 @@ function CreateArea(props) {
           placeholder="Take a note..."
           rows={isExpanded ? 3 : 1}
         />
-        <Zoom in={isExpanded}>
-          <Fab onClick={submitNote}>
-            <AddIcon />
-          </Fab>
-        </Zoom>
+        <div className="fab-buttons-container2">
+          <Zoom in={isExpanded}>
+            <Fab onClick={submitNote}>
+              <AddIcon />
+            </Fab>
+          </Zoom>
+        </div>
       </form>
     </div>
   );
