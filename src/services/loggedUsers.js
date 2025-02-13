@@ -13,7 +13,10 @@ export async function loginUser(credentials, setAlert) {
       return response.data;
     } catch (error) {
       console.error("Error logging in:", error);
-      if (error.response && error.response.status === 401) {
+      if (error.response && error.response.status === 400) {
+        setAlert("error", "No saved users in the database. Register as first user.");
+      }
+      else if (error.response && error.response.status === 401) {
         setAlert("error", "Login Failed. Invalid credentials.");
       } else if (error.response && error.response.status === 500) {
         setAlert("error", "Login Failed. Internal Server Error!.");

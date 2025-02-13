@@ -31,22 +31,36 @@ let usersData = null;
 let notesData = null;
 
 // Wczytywanie danych użytkowników przy uruchomieniu serwera
-const readFile = (req, res, next) => {
-  fs.readFile(dbPath, "utf8", (error, data) => {
-    if (error) {
-      console.log("Error reading db.json:", error);
-    }
-    try {
-      const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
-      usersData = parsedData.users;
-      notesData = parsedData.notes;
-      // console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
-    } catch (error) {
-      console.log("Error parsing JSON:", error);
-    }
-  });
+const readFile = async (req, res, next) => {
+  try {
+    const data = await fs.promises.readFile(dbPath, "utf8");
+    const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
+    usersData = parsedData.users;
+    notesData = parsedData.notes;
+    console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
+  } catch (error) {
+    console.log("Error reading db.json:", error);
+  }
   next();
 };
+
+// Wczytywanie danych użytkowników przy uruchomieniu serwera
+// const readFile = (req, res, next) => {
+//   fs.readFile(dbPath, "utf8", (error, data) => {
+//     if (error) {
+//       console.log("Error reading db.json:", error);
+//     }
+//     try {
+//       const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
+//       usersData = parsedData.users;
+//       notesData = parsedData.notes;
+//       // console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
+//     } catch (error) {
+//       console.log("Error parsing JSON:", error);
+//     }
+//   });
+//   next();
+// };
 
 // Middleware do ustawiania danych użytkowników w req.db
 const setUsersData = (req, res, next) => {
@@ -97,8 +111,9 @@ app.get("/user/notes", authenticateUser, (req, res) => {
 app.post("/login", (req, res) => {
   try {
     const { username, password } = req.body;
-    // console.log("Received login data:", { username, password }); // Dodaj logowanie
-    const user = req.db.users.find(
+    console.log("Received login data:", { username, password }); // Dodaj logowanie
+    console.log("usersData=", usersData);
+    const user = usersData.find(
       (userItem) =>
         userItem.username === username && userItem.password === password
     );
@@ -110,7 +125,11 @@ app.post("/login", (req, res) => {
         { expiresIn: "1h" }
       );
       res.send({ token });
-    } else {
+    } else if (usersData === null) {
+      console.log("No saved users in the database");
+      res.status(400).json({ error: "No saved users in the database." }); // Zwracanie JSON zamiast tekstu
+    }
+    else {
       console.log("Invalid credentials");
       res.status(401).json({ error: "Invalid credentials" }); // Zwracanie JSON zamiast tekstu
     }
@@ -188,6 +207,7 @@ app.post("/register", (req, res) => {
           return res.status(500).send("Internal Server Error");
         } else {
           console.log("New user added successfully!");
+          app.use(setUsersData);
           return res.status(201).send("User registered successfully");
         }
       }
@@ -283,10 +303,10 @@ app.patch("/notes/:id", authenticateUser, (req, res) => {
   console.log("noteIndex = ", noteIndex);
 
   // Zaktualizuj właściwości notatki na podstawie danych w żądaniu
-  if (req.body.section) notesData[noteIndex].section = req.body.section;
-  if (req.body.linkTitle) notesData[noteIndex].linkTitle = req.body.linkTitle;
-  if (req.body.url) notesData[noteIndex].url = req.body.url;
-  if (req.body.description) notesData[noteIndex].description = req.body.description;
+  // if (req.body.section) notesData[noteIndex].section = req.body.section;
+  // if (req.body.linkTitle) notesData[noteIndex].linkTitle = req.body.linkTitle;
+  // if (req.body.url) notesData[noteIndex].url = req.body.url;
+  // if (req.body.description) notesData[noteIndex].description = req.body.description;
 
 //   const userNotes = notesData.filter(
 //     (note) => note.userId === parseInt(req.params.id)
@@ -300,13 +320,13 @@ app.patch("/notes/:id", authenticateUser, (req, res) => {
 //   if (req.body.url) note.url = req.body.url;
 //   if (req.body.description) note.description = req.body.description;
 
-});
-// Zapisz zaktualizowane dane do pliku db.json
-fs.writeFile(dbPath, JSON.stringify(notesData, null, 2), (err) => {
-  if (err) {
-    console.error("Error writing to db.json:", err);
-    return res.status(500).send("Internal Server Error");
-  }
+// });
+// // Zapisz zaktualizowane dane do pliku db.json
+// fs.writeFile(dbPath, JSON.stringify(notesData, null, 2), (err) => {
+//   if (err) {
+//     console.error("Error writing to db.json:", err);
+//     return res.status(500).send("Internal Server Error");
+//   }
   // res.json(notesData[noteIndex]);
 });
 
