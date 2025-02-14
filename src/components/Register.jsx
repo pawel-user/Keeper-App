@@ -56,7 +56,7 @@ export default function Register(props) {
 
   const clearInputs = (e) => {
     e.preventDefault();
-    console.log("Function clearInputs() called.");
+    // console.log("Function clearInputs() called.");
     setUserInput({
       username: "",
       email: "",

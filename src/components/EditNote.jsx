@@ -5,7 +5,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import "../EditNote.css"; // Importuj plik CSS
 
-function EditNote({ note, onUpdate }) {
+function EditNote({ note, onUpdate, setAlert }) {
   const [isExpanded, setExpanded] = useState(false);
   const [editedNote, setEditedNote] = useState({
     section: "",
@@ -25,9 +25,10 @@ function EditNote({ note, onUpdate }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
     // Sprawdzenie, czy wszystkie pola są wypełnione
-    if (!note.section || !note.linkTitle || !note.url || !note.description) {
-      props.setAlert(
+    if (!editedNote.section || !editedNote.linkTitle || !editedNote.url || !editedNote.description) {
+      setAlert(
         "error",
         "Empty fields detected! You need complete all input fields."
       );
@@ -36,8 +37,8 @@ function EditNote({ note, onUpdate }) {
 
     // Sprawdzenie czy adres URL jest w poprawnym formacie
     const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
-    if (!urlRegex.test(note.url)) {
-      props.setAlert(
+    if (!urlRegex.test(editedNote.url)) {
+      setAlert(
         "error",
         "Edited for invalid the website URL format! Please edit again."
       );
@@ -45,14 +46,14 @@ function EditNote({ note, onUpdate }) {
     }
 
         try {
-          const response = await editNote(note.id, note);
+          const response = await editNote(editedNote.id, editedNote);
           if (response.status === 404) {
-            props.setAlert("error", "Note not found!");
+            setAlert("error", "Note not found!");
             return;
           }
           if (response) {
-            // props.setAlert("noteAdded", "New note added successfully.");
             onUpdate(editedNote);
+            setAlert("success", `Note with id  ${editedNote.id} was edited succesfully`);
           }
         } catch (error) {
           console.error("Error while editing user note:", error);

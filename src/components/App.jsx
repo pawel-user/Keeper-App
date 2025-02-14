@@ -204,7 +204,7 @@ function App() {
           <div>
             {isEditing ? (
               <div>
-                <EditNote note={noteToEdit} onUpdate={updateNote} />
+                <EditNote note={noteToEdit} onUpdate={updateNote} setAlert={handleAlert} />
               </div>
             ) : (
               <>

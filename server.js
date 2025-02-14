@@ -37,7 +37,7 @@ const readFile = async (req, res, next) => {
     const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
     usersData = parsedData.users;
     notesData = parsedData.notes;
-    console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
+    // console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
   } catch (error) {
     console.log("Error reading db.json:", error);
   }
@@ -299,8 +299,6 @@ app.patch("/notes/:id", authenticateUser, (req, res) => {
     return res.status(404).send("Note not found.");
   }
 
-  console.log("noteIndex = ", noteIndex);
-
   // Zaktualizuj właściwości notatki na podstawie danych w żądaniu
   if (req.body.section) notesData[noteIndex].section = req.body.section;
   if (req.body.linkTitle) notesData[noteIndex].linkTitle = req.body.linkTitle;
@@ -308,25 +306,23 @@ app.patch("/notes/:id", authenticateUser, (req, res) => {
   if (req.body.description)
     notesData[noteIndex].description = req.body.description;
 
-  //   const userNotes = notesData.filter(
-  //     (note) => note.userId === parseInt(req.params.id)
-  //   );
+  // Zaktualizuj całą strukturę JSON i zapisz do pliku db.json
+  const updatedData = {
+    users: usersData, // Zapisz użytkowników bez zmian
+    notes: notesData, // Zaktualizowana tablica notatek
+  };
 
-  //   const note = userNotes.find((item) => item.id === parseInt(req.params.id));
-  //   if (!note) return res.status(404).json({ message: "Note not found" });
-
-  //   if (req.body.section) note.section = req.body.section;
-  //   if (req.body.linkTitle) note.linkTitle = req.body.linkTitle;
-  //   if (req.body.url) note.url = req.body.url;
-  //   if (req.body.description) note.description = req.body.description;
-
-  // // Zapisz zaktualizowane dane do pliku db.json
-  fs.writeFile(dbPath, JSON.stringify(notesData, null, 2), (err) => {
+  // Zapisz zaktualizowane dane do pliku db.json
+  fs.writeFile(dbPath, JSON.stringify(updatedData, null, 2), (err) => {
     if (err) {
       console.error("Error writing to db.json:", err);
       return res.status(500).send("Internal Server Error");
     }
-    res.json(notesData[noteIndex]);
+    console.log("Data successfully written to db.json");
+    // Dodaj krótkie opóźnienie, aby upewnić się, że dane są w pełni zapisane
+    setTimeout(() => {
+      res.json(notesData[noteIndex]);
+    }, 100);
   });
 });
 

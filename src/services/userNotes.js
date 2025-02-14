@@ -35,23 +35,22 @@ export async function addNote(newNote) {
   }
 }
 
-// Funkcja edycji notatki
-export async function editNote(noteId, updatedNote) {
+export async function editNote(noteId, noteData) {
   try {
     const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
     const response = await axios.patch(
       `${API_URL}/notes/${noteId}`,
-      updatedNote,
+      noteData,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
+          Authorization: `Bearer ${token}`, // Dodaj tutaj swój token, jeśli jest wymagany
         },
       }
     );
-    return response;
+    return response.data;
   } catch (error) {
-    console.error("Editing note error: ", error);
+    console.error("Error in editNote:", error);
     throw error;
   }
 }

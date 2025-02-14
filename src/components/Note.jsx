@@ -7,10 +7,8 @@ function Note(props) {
   const navigate = useNavigate();
   
   function handleEditClick(event) {
-    navigate("/note/edit");
-
     event.preventDefault();
-
+    navigate("/notes/" + `${props.id+1}`);
     props.onEdit(props.id);
   }
   function handleDeleteClick() {
@@ -29,7 +27,7 @@ function Note(props) {
       </button>
       <Link
         component={Link}
-        to="/note/edit"
+        to={`/note/edit/${props.id+1}`}
         style={{ textDecoration: "none", color: "inherit" }}
         onClick={handleEditClick}
       >
