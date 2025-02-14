@@ -18,28 +18,28 @@ export default function Welcome() {
       <div className="container">
         <div className="left">
           <h2>Register</h2>
-          <Fab>
-            <Link
-              component={Link}
-              to="/register"
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
+          <Link
+            component={Link}
+            to="/register"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <Fab>
               <AppRegistrationIcon />
-            </Link>
-          </Fab>
+            </Fab>
+          </Link>
         </div>
         <div className="right">
           <h2>Sign In</h2>
-          <Fab>
-            <Link
-              component={Link}
-              to="/login"
-              style={{ textDecoration: "none", color: "inherit" }}
-              onClick={handleLogin}
-            >
+          <Link
+            component={Link}
+            to="/login"
+            style={{ textDecoration: "none", color: "inherit" }}
+            onClick={handleLogin}
+          >
+            <Fab>
               <LoginIcon />
-            </Link>
-          </Fab>
+            </Fab>
+          </Link>
         </div>
       </div>
     </div>

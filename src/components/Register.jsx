@@ -1,26 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-// import { addUser } from "../services/registeredUsers";
+import {registerUser} from "../services/registeredUsers.js";
 
-async function registerUser(newUserData) {
-  try {
-    const response = await axios.post(
-      "http://localhost:8080/register",
-      newUserData,
-      { headers: { "Content-Type": "application/json" } }
-    );
-    return response;
-    // console.log(response.data);
-  } catch (error) {
-    console.error("Registration error: ", error);
-    throw error;
-  }
-}
 
-export default function Register({ setAlert }) {
-  // console.log("Users inside Register component:", users); // Logowanie users
-
+export default function Register(props) {
   const [userInput, setUserInput] = useState({
     username: "",
     email: "",
@@ -39,40 +22,49 @@ export default function Register({ setAlert }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting registration form with data:", userInput);
     try {
       const response = await registerUser(userInput);
       if (response) {
-        // Wywołanie asynchronicznej funkcji addUser(), aby zapisać nowego użytkownika do pliku JSON
-        // await addUser(userInput);
-        setAlert("register", "Registration successful!");
-        // Opóźnienie na 3 sekundy przed nawigacją do innej strony
+        props.setAlert("register", "Registration successful!");
+        // Opóźnienie na 2 sekundy przed nawigacją do innej strony
         setTimeout(() => {
           navigate("/");
         }, 2000); // 2000 milisekund = 2 sekundy
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      if (error.response && error.response.status === 409) {
-        setAlert(
+      if (error.status === 409) {
+        props.setAlert(
           "error",
           "This user already exists! Try login or enter other data to register"
         );
-      } else if (error.response && error.response.status === 407) {
-        setAlert(
+      } else if (error.status === 400 && error.response.data === 'All fields are required') {
+        props.setAlert(
           "error",
           "Empty fields detected! All input fields are required."
         );
-      } else if (error.response && error.response.status === 408) {
-        setAlert("error", "Invalid email format! Please try again.");
-      } else {
-        setAlert(
+      } else if (error.status === 400 && error.response.data === 'Invalid email format') {
+        props.setAlert("error", "Invalid email format! Please try again.");
+      } else if (error.status === 400 && error.response.data === 'User credentials failed') {
+        props.setAlert(
           "error",
           "Registration Failed. The user credentials are not the same! Please try again."
         );
       }
     }
   };
+
+  const clearInputs = (e) => {
+    e.preventDefault();
+    // console.log("Function clearInputs() called.");
+    setUserInput({
+      username: "",
+      email: "",
+      password: "",
+      repeatedPassword: "",
+    });
+  }
+  
 
   return (
     <div className="login-wrapper">
@@ -118,8 +110,9 @@ export default function Register({ setAlert }) {
             autoComplete="new-password"
           />
         </label>
-        <div>
+        <div class="button-container">
           <button type="submit">Sign up</button>
+          <button onClick={clearInputs} className="clear-button">Clear</button>
         </div>
       </form>
     </div>

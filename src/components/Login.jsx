@@ -1,28 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import {loginUser} from "../services/loggedUsers.js";
 import propTypes from "prop-types";
-
-async function loginUser(credentials, setAlert) {
-  try {
-    const response = await axios.post(
-      "http://localhost:8080/login",
-      credentials,
-      { headers: { "Content-Type": "application/json" } }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error logging in:", error);
-    if (error.response && error.response.status === 401) {
-      setAlert("error", "Login Failed. Invalid credentials.");
-    } else if (error.response && error.response.status === 500) {
-      setAlert("error", "Login Failed. Internal Server Error!.");
-    } else {
-      setAlert("error", "Login Failed. Please try again later.");
-    }
-    throw error;
-  }
-}
 
 export default function Login({ setToken, setLogin, setAlert }) {
   const [username, setUserName] = useState();
@@ -31,7 +10,6 @@ export default function Login({ setToken, setLogin, setAlert }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Logging in with credentials:", { username, password }); // Dodaj logowanie
     try {
       const token = await loginUser(
         {

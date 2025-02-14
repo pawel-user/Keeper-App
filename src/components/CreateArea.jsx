@@ -1,28 +1,29 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { addNote } from "../services/userNotes.js";
 import AddIcon from "@mui/icons-material/Add";
-import { Fab } from "@mui/material";
 import { Zoom } from "@mui/material";
+import { Fab } from "@mui/material";
+// import axios from "axios";
 
-async function addNote(newNote) {
-  try {
-    const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
-    const response = await axios.post(
-      "http://localhost:8080/add/note",
-      newNote,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
-        },
-      }
-    );
-    return response;
-  } catch (error) {
-    console.error("Adding new note error: ", error);
-    throw error;
-  }
-}
+// async function addNote(newNote) {
+//   try {
+//     const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
+//     const response = await axios.post(
+//       "http://localhost:8080/add/note",
+//       newNote,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
+//         },
+//       }
+//     );
+//     return response;
+//   } catch (error) {
+//     console.error("Adding new note error: ", error);
+//     throw error;
+//   }
+// }
 
 function CreateArea(props) {
   const [isExpanded, setExpanded] = useState(false);
@@ -58,7 +59,6 @@ function CreateArea(props) {
 
     // Sprawdzenie czy adres URL jest w poprawnym formacie
     const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
-    console.log(urlRegex);
     if (!urlRegex.test(note.url)) {
       props.setAlert(
         "error",
@@ -85,19 +85,6 @@ function CreateArea(props) {
       }
     } catch (error) {
       console.error("Error while adding new user note:", error);
-      // if (error.response && error.response.status === 409) {
-      //   props.setAlert(
-      //     "error",
-      //     "Note with the website URL already exists!"
-      //   );
-      // } else if (error.response && error.response.status === 407) {
-      //   props.setAlert(
-      //     "error",
-      //     "Empty fields detected! All input fields are required."
-      //   );
-      // } else if (error.response && error.response.status === 400) {
-      //   props.setAlert("error", "Invalid the website URL format! Please try again.");
-      // }
     }
   }
 
@@ -143,11 +130,13 @@ function CreateArea(props) {
           placeholder="Take a note..."
           rows={isExpanded ? 3 : 1}
         />
-        <Zoom in={isExpanded}>
-          <Fab onClick={submitNote}>
-            <AddIcon />
-          </Fab>
-        </Zoom>
+        <div className="fab-buttons-container2">
+          <Zoom in={isExpanded}>
+            <Fab onClick={submitNote}>
+              <AddIcon />
+            </Fab>
+          </Zoom>
+        </div>
       </form>
     </div>
   );

@@ -1,32 +1,31 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import {logoutUser} from "../services/loggedUsers.js";
 import LogoutIcon from "@mui/icons-material/Logout";
+// import axios from "axios";
 
-async function logoutUser(token) {
-  if (!token) {
-    throw new Error("No token, user is already logged out.");
-  }
-  try {
-    // Dodaj logowanie tokena
-    // console.log("Token przed wysłaniem żądania wylogowania:", token); 
-    const response = await axios.post(
-      "http://localhost:8080/logout",
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error while logging out:", error);
-    throw error;
-  }
-  return true;
-}
+
+// async function logoutUser(token) {
+//   if (!token) {
+//     throw new Error("No token, user is already logged out.");
+//   }
+//   try {
+//     const response = await axios.post(
+//       "http://localhost:8080/logout",
+//       {},
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error while logging out:", error);
+//     throw error;
+//   }
+// }
 
 export default function Logout(props) {
   const navigate = useNavigate();
@@ -41,6 +40,8 @@ export default function Logout(props) {
     await logoutUser(token);
     props.setLogin(false);
     props.setToken("");
+    props.setIsEditing(false); // Resetowanie stanu isEditing
+    props.setNoteToEdit(null); // Resetowanie edytowanej notatki
     localStorage.removeItem("token");
     props.setAlert("logout", "Logout successful");
     navigate("/");

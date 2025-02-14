@@ -7,8 +7,8 @@ import Note from "./Note";
 import CreateArea from "./CreateArea";
 import Welcome from "./Welcome";
 import Login from "./Login";
-import Logout from "./Logout";
 import Register from "./Register";
+import EditNote from "./EditNote";
 import useToken from "./useToken";
 import { getUsers } from "../services/registeredUsers.js";
 import { getNotes } from "../services/userNotes.js";
@@ -18,12 +18,13 @@ function App() {
     type: "",
     message: "",
     visible: false,
-    // reload: false, // Dodanie flagi do wymuszenia przeładowania
   });
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
   const [isLoggedIn, setLogin] = useState(!!token);
+  const [isEditing, setIsEditing] = useState(false);
+  const [noteToEdit, setNoteToEdit] = useState(null);
   const mounted = useRef(true);
   const fetchNotesCalled = useRef(false);
 
@@ -32,12 +33,11 @@ function App() {
       type,
       message,
       visible: true,
-      // reload: type === "noteAdded", // Ustawienie flagi, gdy nowa notatka zostanie dodana  
     });
     if (type === "noteAdded") {
       setTimeout(reloadPage, 2000); // Wywołanie funkcji reloadPage z opóźnieniem 2 sekund
+    }
   };
-}
 
   const reloadPage = () => {
     window.location.reload(); // Wymuszenie przeładowania strony
@@ -82,7 +82,6 @@ function App() {
 
   useEffect(() => {
     async function fetchNotes() {
-      console.log("fetchNotes function called");
       if (token) {
         try {
           // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
@@ -93,12 +92,16 @@ function App() {
             // Token wygasł
             setToken(null);
             setLogin(false);
+            setIsEditing(false); // Resetowanie stanu isEditing
+            setNoteToEdit(null); // Resetowanie edytowanej notatki
             window.location.href = "/";
           } else {
             const fetchedNotes = await getNotes(token);
             if (fetchedNotes.status === 401) {
               setToken(null);
               setLogin(false);
+              setIsEditing(false); // Resetowanie stanu isEditing
+              setNoteToEdit(null); // Resetowanie edytowanej notatki
               window.location.href = "/";
             } else {
               setNotes(fetchedNotes);
@@ -108,6 +111,8 @@ function App() {
           console.error("Error decoding token or fetching notes:", error);
           setToken(null);
           setLogin(false);
+          setIsEditing(false); // Resetowanie stanu isEditing
+          setNoteToEdit(null); // Resetowanie edytowanej notatki
           window.location.href = "/";
         }
       }
@@ -119,70 +124,20 @@ function App() {
     }
   }, [isLoggedIn, token, setToken]);
 
-  // useEffect(() => {
-  //   async function fetchNotes() {
-  //     if (token) {
-  //       // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
-  //       const decodedToken = jwtDecode(token);
-  //       const currentTime = Date.now() / 1000;
-
-  //       if (decodedToken.exp < currentTime) {
-  //         // Token wygasł
-  //         setToken(null);
-  //         setLogin(false);
-  //         window.location.href = "/";
-  //       } else {
-  //         const fetchedNotes = await getNotes(token);
-  //         if (fetchedNotes.status === 401) {
-  //           setToken(null);
-  //           setLogin(false);
-  //           window.location.href = "/";
-  //         } else {
-  //           setNotes(fetchedNotes);
-  //         }
-  //       }
-  //     }
-  //   }
-  //   fetchNotes();
-  // }, [token, setToken]);
-
-  // useEffect(() => {
-  //   async function fetchNotes() {
-  //     if (token) {
-  //       const fetchedNotes = await getNotes(token);
-  //       if (fetchedNotes.status === 401) {
-  //         // Token expired, redirect to home
-  //         setToken(null);
-  //         setLogin(false);
-  //         window.location.href = "/"; // Użycie window.location.href do przekierowania
-  //       } else {
-  //         setNotes(fetchedNotes);
-  //       }
-  //     }
-  //   }
-  //   fetchNotes();
-  // }, [token, setToken]);
-
   // Update isLoggedIn when token changes
   useEffect(() => {
     setLogin(!!token);
   }, [token]);
 
-
   // Funkcja addNote
-function addNote(newNote) {
-  setNotes((prevNotes) => {
-    const updatedNotes = [...prevNotes, newNote];
-    localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
-    handleAlert("noteAdded", "New note added successfully!"); // Wywołanie alertu z flagą reload
-    return updatedNotes;
-  });
-}
-  // function addNote(newNote) {
-  //   setNotes((prevNotes) => {
-  //     return [...prevNotes, newNote];
-  //   });
-  // }
+  function addNote(newNote) {
+    setNotes((prevNotes) => {
+      const updatedNotes = [...prevNotes, newNote];
+      localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
+      handleAlert("noteAdded", "New note added successfully!");
+      return updatedNotes;
+    });
+  }
 
   function deleteNote(id) {
     setNotes((prevNotes) => {
@@ -192,6 +147,22 @@ function addNote(newNote) {
     });
   }
 
+  const editNote = (id) => {
+    const note = notes.find((noteItem, index) => index === id);
+    setNoteToEdit(note);
+    setIsEditing(true);
+  };
+
+  const updateNote = (updatedNote) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((noteItem, index) =>
+        index === noteToEdit.id - 1 ? updatedNote : noteItem
+      )
+    );
+    setIsEditing(false);
+    setNoteToEdit(null);
+  };
+
   return (
     <Router>
       <div>
@@ -200,6 +171,8 @@ function addNote(newNote) {
           setToken={setToken}
           setLogin={setLogin}
           setAlert={handleAlert}
+          setIsEditing={setIsEditing}
+          setNoteToEdit={setNoteToEdit}
         />
         {alert.visible ? (
           <div className="main-panel-wrapper">
@@ -210,7 +183,7 @@ function addNote(newNote) {
         {!isLoggedIn && !token ? (
           <div className="main-panel-wrapper">
             <Routes>
-              <Route path="/" element={<Welcome />} />
+              <Route path="" element={<Welcome />} />
               <Route
                 path="/register"
                 element={<Register setAlert={handleAlert} />}
@@ -229,20 +202,29 @@ function addNote(newNote) {
           </div>
         ) : (
           <div>
-            <CreateArea onAdd={addNote} setAlert={handleAlert} />
-            {notes.map((noteItem, index) => {
-              return (
-                <Note
-                  key={index}
-                  id={index}
-                  section={noteItem.section}
-                  linkTitle={noteItem.linkTitle}
-                  url={noteItem.url}
-                  description={noteItem.description}
-                  onDelete={deleteNote}
-                />
-              );
-            })}
+            {isEditing ? (
+              <div>
+                <EditNote note={noteToEdit} onUpdate={updateNote} setAlert={handleAlert} />
+              </div>
+            ) : (
+              <>
+                <CreateArea onAdd={addNote} setAlert={handleAlert} />
+                {notes.map((noteItem, index) => {
+                  return (
+                    <Note
+                      key={index}
+                      id={index}
+                      section={noteItem.section}
+                      linkTitle={noteItem.linkTitle}
+                      url={noteItem.url}
+                      description={noteItem.description}
+                      onEdit={editNote}
+                      onDelete={deleteNote}
+                    />
+                  );
+                })}
+              </>
+            )}
           </div>
         )}
         <Footer />
