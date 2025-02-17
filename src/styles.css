@@ -3,13 +3,29 @@
   margin: 0;
   box-sizing: border-box;
 }
+
 html {
   font-family: "Montserrat", sans-serif;
 }
+
 body {
   background: #eee;
   background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
   padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+  margin-top: 120px; /* Dopasuj wartość w zależności od wysokości nagłówka */
 }
 
 header {
@@ -17,6 +33,10 @@ header {
   margin: auto -16px;
   padding: 16px 32px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  /* z-index: 1000; Zwiększ indeks z, aby nagłówek był nad innymi elementami */
 }
 
 header h1 {
@@ -26,16 +46,41 @@ header h1 {
 }
 
 footer {
-  position: absolute;
+  /* background-color: #f8f9fa; */
   text-align: center;
-  bottom: 0;
+  padding: 1rem;
+  position: fixed;
   width: 100%;
-  height: 2.5rem;
+  bottom: 0;
+}
+
+/* Style dla alertów */
+.alert {
+  position: fixed;
+  top: 150px; /* Dopasuj wartość w zależności od wysokości nagłówka */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500; /* Upewnij się, że alerty są nad innymi elementami, w tym nagłówkiem */
+  padding: 10px 20px;
+  color: #333;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+  background-color: #4caf50;
+  color: #FAFAFA;
+}
+
+.alert-error {
+  background-color: #F4511E;
+  color: #fffde7;
 }
 
 footer p {
   color: #ccc;
 }
+
 .note {
   background: #fff;
   border-radius: 7px;
@@ -45,10 +90,12 @@ footer p {
   margin: 16px;
   float: left;
 }
+
 .note h1 {
   font-size: 1.1em;
   margin-bottom: 6px;
 }
+
 .note p {
   font-size: 1.1em;
   margin-bottom: 10px;
@@ -115,6 +162,10 @@ form.create-note button {
 
 .main-panel-wrapper h1 {
   margin-top: 100px;
+}
+
+.main-panel-wrapper .info {
+  margin-top: 50px;
 }
 
 .container {

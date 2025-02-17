@@ -3,27 +3,6 @@ import { addNote } from "../services/userNotes.js";
 import AddIcon from "@mui/icons-material/Add";
 import { Zoom } from "@mui/material";
 import { Fab } from "@mui/material";
-// import axios from "axios";
-
-// async function addNote(newNote) {
-//   try {
-//     const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
-//     const response = await axios.post(
-//       "http://localhost:8080/add/note",
-//       newNote,
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
-//         },
-//       }
-//     );
-//     return response;
-//   } catch (error) {
-//     console.error("Adding new note error: ", error);
-//     throw error;
-//   }
-// }
 
 function CreateArea(props) {
   const [isExpanded, setExpanded] = useState(false);
@@ -127,7 +106,7 @@ function CreateArea(props) {
           onChange={handleChange}
           value={note.description}
           placeholder="Take a note..."
-          rows={isExpanded ? 3 : 1}
+          rows={isExpanded ? 6 : 1}
         />
         <div className="fab-buttons-container2">
           <Zoom in={isExpanded}>

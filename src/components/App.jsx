@@ -51,7 +51,7 @@ function App() {
     if (!alert.visible) {
       return;
     }
-    if (alert.type === "login" || alert.type === "register") {
+    if (alert.type === "success") {
       getUsers().then((userItems) => {
         if (mounted.current) {
           setUsers(userItems || []);
@@ -180,7 +180,7 @@ function App() {
 
   return (
     <Router>
-      <div>
+      <div className="app-container">
         <Header
           isLoggedIn={isLoggedIn}
           setToken={setToken}
@@ -189,74 +189,81 @@ function App() {
           setIsEditing={setIsEditing}
           setNoteToEdit={setNoteToEdit}
         />
-        {alert.visible ? (
-          <div className="main-panel-wrapper">
-            <h2>{alert.message}</h2>
-          </div>
-        ) : null}
+        <div className="content">
+          {alert.visible ? (
+            <div className={`alert alert-${alert.type}`}>{alert.message}</div>
+          ) : null}
+          {/* {alert.visible ? (
+            <div className="main-panel-wrapper">
+              <h2>{alert.message}</h2>
+            </div>
+          ) : null} */}
 
-        {!isLoggedIn && !token ? (
-          <div className="main-panel-wrapper">
-            <Routes>
-              <Route path="" element={<Welcome />} />
-              <Route
-                path="/register"
-                element={<Register setAlert={handleAlert} />}
-              />
-              <Route
-                path="/login"
-                element={
-                  <Login
-                    setToken={setToken}
-                    setLogin={setLogin}
+          {!isLoggedIn && !token ? (
+            <div className="main-panel-wrapper">
+              <Routes>
+                <Route path="" element={<Welcome />} />
+                <Route
+                  path="/register"
+                  element={<Register setAlert={handleAlert} />}
+                />
+                <Route
+                  path="/login"
+                  element={
+                    <Login
+                      setToken={setToken}
+                      setLogin={setLogin}
+                      setAlert={handleAlert}
+                    />
+                  }
+                />
+              </Routes>
+            </div>
+          ) : (
+            <div className="content">
+              {isEditing ? (
+                <div>
+                  <EditNote
+                    note={noteToEdit}
+                    onUpdate={updateNote}
                     setAlert={handleAlert}
                   />
-                }
-              />
-            </Routes>
-          </div>
-        ) : (
-          <div>
-            {isEditing ? (
-              <div>
-                <EditNote
-                  note={noteToEdit}
-                  onUpdate={updateNote}
-                  setAlert={handleAlert}
-                />
-              </div>
-            ) : isDeleting ? (
-              <div>
-                <DeleteNote
-                  note={noteToDelete}
-                  onRemove={removeNote}
-                  setAlert={handleAlert}
-                  cancelDelete={cancelDelete}
-                />
-              </div>
-            ) : (
-              <>
-                <CreateArea onAdd={addNote} setAlert={handleAlert} />
-                {notes && notes.length > 0 ? (
-                  notes.map((noteItem, index) => (
-                    <Note
-                      key={index}
-                      id={index}
-                      section={noteItem.section}
-                      linkTitle={noteItem.linkTitle}
-                      url={noteItem.url}
-                      description={noteItem.description}
-                      onEdit={editNote}
-                      onDelete={deleteNote}
-                    />
-                  ))
-                ) : (
-                  <p>No notes available</p>
-                )}
-              </>
-            )}
-          </div>
-        )}
+                </div>
+              ) : isDeleting ? (
+                <div>
+                  <DeleteNote
+                    note={noteToDelete}
+                    onRemove={removeNote}
+                    setAlert={handleAlert}
+                    cancelDelete={cancelDelete}
+                  />
+                </div>
+              ) : (
+                <>
+                  <CreateArea onAdd={addNote} setAlert={handleAlert} />
+                  {notes && notes.length > 0 ? (
+                    notes.map((noteItem, index) => (
+                      <Note
+                        key={index}
+                        id={index}
+                        section={noteItem.section}
+                        linkTitle={noteItem.linkTitle}
+                        url={noteItem.url}
+                        description={noteItem.description}
+                        onEdit={editNote}
+                        onDelete={deleteNote}
+                      />
+                    ))
+                  ) : (
+                    <div className="main-panel-wrapper">
+                      <p>No notes available</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </div>
         <Footer />
       </div>
     </Router>

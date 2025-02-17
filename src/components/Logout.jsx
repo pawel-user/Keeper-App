@@ -43,7 +43,7 @@ export default function Logout(props) {
     props.setIsEditing(false); // Resetowanie stanu isEditing
     props.setNoteToEdit(null); // Resetowanie edytowanej notatki
     localStorage.removeItem("token");
-    props.setAlert("logout", "Logout successful");
+    props.setAlert("success", "Logout successful");
     navigate("/");
     return true;
   };
