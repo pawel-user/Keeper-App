@@ -3,27 +3,6 @@ import { addNote } from "../services/userNotes.js";
 import AddIcon from "@mui/icons-material/Add";
 import { Zoom } from "@mui/material";
 import { Fab } from "@mui/material";
-// import axios from "axios";
-
-// async function addNote(newNote) {
-//   try {
-//     const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
-//     const response = await axios.post(
-//       "http://localhost:8080/add/note",
-//       newNote,
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`, // Dodanie nagłówka Authorization z tokenem
-//         },
-//       }
-//     );
-//     return response;
-//   } catch (error) {
-//     console.error("Adding new note error: ", error);
-//     throw error;
-//   }
-// }
 
 function CreateArea(props) {
   const [isExpanded, setExpanded] = useState(false);
@@ -69,12 +48,7 @@ function CreateArea(props) {
 
     try {
       const response = await addNote(note);
-      if (response.status === 409) {
-        props.setAlert("error", "Note with the website URL already exists!");
-        return;
-      }
-      if (response) {
-        // props.setAlert("noteAdded", "New note added successfully.");
+      if (response.status === 201) {
         props.onAdd(note);
         setNote({
           section: "",
@@ -85,7 +59,11 @@ function CreateArea(props) {
       }
     } catch (error) {
       console.error("Error while adding new user note:", error);
-    }
+      if (error.response && error.response.status === 400 && error.response.data.message === "Note with the website URL already exists") {
+        props.setAlert("error", "Note with the website URL already exists!");
+      } else {
+        props.setAlert("error", "Error while adding new user note. Please try again.");
+      }    }
   }
 
   function expand() {
@@ -128,7 +106,7 @@ function CreateArea(props) {
           onChange={handleChange}
           value={note.description}
           placeholder="Take a note..."
-          rows={isExpanded ? 3 : 1}
+          rows={isExpanded ? 6 : 1}
         />
         <div className="fab-buttons-container2">
           <Zoom in={isExpanded}>

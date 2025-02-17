@@ -10,7 +10,7 @@ function Header(props) {
       <h1>
         <HighlightIcon/> Keeper
       </h1>
-        {props.isLoggedIn ? <Logout setLogin={props.setLogin} setToken={props.setToken} setAlert={props.setAlert} setIsEditing={props.setIsEditing} setNoteToEdit={props.setIsEditing}/> : null}
+        {props.isLoggedIn ? <Logout setLogin={props.setLogin} setToken={props.setToken} setAlert={props.setAlert} setIsEditing={props.setIsEditing} setNoteToEdit={props.setIsEditing} setIsDeleting={props.setIsDeleting}/> : null}
     </header>
   );
 }

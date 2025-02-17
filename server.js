@@ -220,25 +220,7 @@ app.post("/register", (req, res) => {
 app.post("/add/note", authenticateUser, (req, res) => {
   try {
     const uploadedNote = req.body;
-    console.log("New note data received:", uploadedNote);
-
-    // Walidacja danych dla notatki użytkownika
-    // if (
-    //   !uploadedNote.section ||
-    //   !uploadedNote.linkTitle ||
-    //   !uploadedNote.url ||
-    //   !uploadedNote.description
-    // ) {
-    //   console.log("Empty fields detected!");
-    //   return res.status(407).send("All fields are required");
-    // }
-
-    // Sprawdzenie czy adres URL jest w poprawnym formacie
-    // const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
-    // if (!urlRegex.test(uploadedNote.url)) {
-    //   console.log("Invalid URL format!");
-    //   return res.status(400).send("Invalid URL format");
-    // }
+    // console.log("New note data received:", uploadedNote);
 
     const userNotes = req.db.notes.filter(
       (note) => note.userId === req.user.id
@@ -250,8 +232,7 @@ app.post("/add/note", authenticateUser, (req, res) => {
     );
 
     if (noteUrlExists) {
-      console.log("The note with this address URL of website already exists!");
-      return res.status(409).send("Note with the website URL already exists");
+      return res.status(400).json({ message: "Note with the website URL already exists" });
     }
 
     // Generowanie unikalnego identyfikatora dla nowej notatki dla zarejestrowanego użytkownika
@@ -322,6 +303,33 @@ app.patch("/notes/:id", authenticateUser, (req, res) => {
     // Dodaj krótkie opóźnienie, aby upewnić się, że dane są w pełni zapisane
     setTimeout(() => {
       res.json(notesData[noteIndex]);
+    }, 100);
+  });
+});
+
+// Usuń post użytkownika o określonym id
+app.delete("/notes/:id",authenticateUser, (req, res) => {
+  const noteIndex = notesData.findIndex((p) => p.id === parseInt(req.params.id));
+  if (noteIndex === -1) return res.status(404).json({ message: "Note not found" });
+
+  notesData.splice(noteIndex, 1);
+
+    // Zaktualizuj całą strukturę JSON i zapisz do pliku db.json
+    const updatedData = {
+      users: usersData, // Zapisz użytkowników bez zmian
+      notes: notesData, // Zaktualizowana tablica notatek
+    };
+  
+  // Zapisz zaktualizowane dane do pliku db.json
+  fs.writeFile(dbPath, JSON.stringify(updatedData, null, 2), (err) => {
+    if (err) {
+      console.error("Error writing to db.json:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    console.log("Data successfully written to db.json");
+    // Dodaj krótkie opóźnienie, aby upewnić się, że dane są w pełni zapisane
+    setTimeout(() => {
+      res.json({ message: "Post deleted" });
     }, 100);
   });
 });

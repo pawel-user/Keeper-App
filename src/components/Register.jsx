@@ -25,7 +25,7 @@ export default function Register(props) {
     try {
       const response = await registerUser(userInput);
       if (response) {
-        props.setAlert("register", "Registration successful!");
+        props.setAlert("success", "Registration successful!");
         // Opóźnienie na 2 sekundy przed nawigacją do innej strony
         setTimeout(() => {
           navigate("/");

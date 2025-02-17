@@ -51,6 +51,10 @@ function EditNote({ note, onUpdate, setAlert }) {
             setAlert("error", "Note not found!");
             return;
           }
+          if (response.status === 400) {
+            setAlert("error", "Note with the website URL already exists.");
+            return;
+          }
           if (response) {
             onUpdate(editedNote);
             setAlert("success", `Note with id  ${editedNote.id} was edited succesfully`);

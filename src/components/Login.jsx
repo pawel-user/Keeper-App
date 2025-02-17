@@ -20,7 +20,7 @@ export default function Login({ setToken, setLogin, setAlert }) {
       );
       setToken(token);
       setLogin(true);
-      setAlert("login", "Login Successful");
+      setAlert("success", "Login Successful");
       navigate("/");
     } catch (error) {
       // `setAlert` is already called in `loginUser` in case of error
