@@ -38,19 +38,32 @@ export async function addNote(newNote) {
 export async function editNote(noteId, noteData) {
   try {
     const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
-    const response = await axios.patch(
-      `${API_URL}/notes/${noteId}`,
-      noteData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Dodaj tutaj swój token, jeśli jest wymagany
-        },
-      }
-    );
+    const response = await axios.patch(`${API_URL}/notes/${noteId}`, noteData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Dodanie tokena, jeśli jest wymagany
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error in editNote:", error);
+    throw error;
+  }
+}
+
+export async function deleteNote(noteId) {
+  try {
+    const token = localStorage.getItem("token"); // Pobranie tokena z localStorage lub innego źródła
+    const response = await axios.delete(`${API_URL}/notes/${noteId}`, 
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Dodanie tokena, jeśli jest wymagany
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteNote:", error);
     throw error;
   }
 }

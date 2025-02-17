@@ -69,12 +69,7 @@ function CreateArea(props) {
 
     try {
       const response = await addNote(note);
-      if (response.status === 409) {
-        props.setAlert("error", "Note with the website URL already exists!");
-        return;
-      }
-      if (response) {
-        // props.setAlert("noteAdded", "New note added successfully.");
+      if (response.status === 201) {
         props.onAdd(note);
         setNote({
           section: "",
@@ -85,7 +80,11 @@ function CreateArea(props) {
       }
     } catch (error) {
       console.error("Error while adding new user note:", error);
-    }
+      if (error.response && error.response.status === 400 && error.response.data.message === "Note with the website URL already exists") {
+        props.setAlert("error", "Note with the website URL already exists!");
+      } else {
+        props.setAlert("error", "Error while adding new user note. Please try again.");
+      }    }
   }
 
   function expand() {

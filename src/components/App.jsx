@@ -9,6 +9,7 @@ import Welcome from "./Welcome";
 import Login from "./Login";
 import Register from "./Register";
 import EditNote from "./EditNote";
+import DeleteNote from "./DeleteNote";
 import useToken from "./useToken";
 import { getUsers } from "../services/registeredUsers.js";
 import { getNotes } from "../services/userNotes.js";
@@ -25,6 +26,8 @@ function App() {
   const [isLoggedIn, setLogin] = useState(!!token);
   const [isEditing, setIsEditing] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
   const mounted = useRef(true);
   const fetchNotesCalled = useRef(false);
 
@@ -139,13 +142,25 @@ function App() {
     });
   }
 
-  function deleteNote(id) {
+  const deleteNote = (id) => {
+    const deleteNote = notes.find((noteItem, index) => index === id);
+    setNoteToDelete(deleteNote);
+    setIsDeleting(true); // Ustaw isDeleting na true
+  };
+
+  const removeNote = (id) => {
     setNotes((prevNotes) => {
-      return prevNotes.filter((noteItem, index) => {
-        return index !== id;
-      });
+      const updatedNotes = prevNotes.filter((noteItem, index) => index !== id);
+      setIsDeleting(false); // Set isDeleting to false after deletion
+      setNoteToDelete(null);
+      return updatedNotes; // Zwróć zaktualizowaną tablicę notatek
     });
-  }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleting(false); // Reset isDeleting state
+    setNoteToDelete(null); // Reset the note being deleted
+  };
 
   const editNote = (id) => {
     const note = notes.find((noteItem, index) => index === id);
@@ -204,13 +219,26 @@ function App() {
           <div>
             {isEditing ? (
               <div>
-                <EditNote note={noteToEdit} onUpdate={updateNote} setAlert={handleAlert} />
+                <EditNote
+                  note={noteToEdit}
+                  onUpdate={updateNote}
+                  setAlert={handleAlert}
+                />
+              </div>
+            ) : isDeleting ? (
+              <div>
+                <DeleteNote
+                  note={noteToDelete}
+                  onRemove={removeNote}
+                  setAlert={handleAlert}
+                  cancelDelete={cancelDelete}
+                />
               </div>
             ) : (
               <>
                 <CreateArea onAdd={addNote} setAlert={handleAlert} />
-                {notes.map((noteItem, index) => {
-                  return (
+                {notes && notes.length > 0 ? (
+                  notes.map((noteItem, index) => (
                     <Note
                       key={index}
                       id={index}
@@ -221,8 +249,10 @@ function App() {
                       onEdit={editNote}
                       onDelete={deleteNote}
                     />
-                  );
-                })}
+                  ))
+                ) : (
+                  <p>No notes available</p>
+                )}
               </>
             )}
           </div>
