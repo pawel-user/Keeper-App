@@ -26,7 +26,6 @@ function Note(props) {
       <p>{props.description}</p>
       <Link
         component={Link}
-        // to={`/note/delete/${props.id + 1}`}
         style={{ textDecoration: "none", color: "inherit" }}
         onClick={handleDeleteClick}
       >
@@ -37,7 +36,6 @@ function Note(props) {
 
       <Link
         component={Link}
-        // to={`/note/edit/${props.id + 1}`}
         style={{ textDecoration: "none", color: "inherit" }}
         onClick={handleEditClick}
       >

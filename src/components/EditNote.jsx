@@ -3,9 +3,10 @@ import { Zoom, Fab } from "@mui/material";
 import {editNote} from "../services/userNotes.js";
 import EditIcon from "@mui/icons-material/Edit";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
+import CloseIcon from '@mui/icons-material/Close';
 import "../EditNote.css"; // Importuj plik CSS
 
-function EditNote({ note, onUpdate, setAlert }) {
+function EditNote({ note, onUpdate, setAlert, cancelAction }) {
   const [isExpanded, setExpanded] = useState(false);
   const [editedNote, setEditedNote] = useState({
     section: "",
@@ -129,6 +130,16 @@ function EditNote({ note, onUpdate, setAlert }) {
               aria-label="clear"
             >
               <ClearAllIcon />
+            </Fab>
+          </Zoom>
+          <Zoom in={true}>
+            <Fab
+              className="fab-cancel-button"
+              onClick={cancelAction}
+              color="primary"
+              aria-label="clear"
+            >
+              <CloseIcon />
             </Fab>
           </Zoom>
         </div>

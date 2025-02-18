@@ -36,7 +36,7 @@ header {
   position: fixed;
   top: 0;
   width: 100%;
-  /* z-index: 1000; Zwiększ indeks z, aby nagłówek był nad innymi elementami */
+  z-index: 1000; /* Zwiększ indeks z, aby nagłówek był nad innymi elementami */
 }
 
 header h1 {
@@ -49,9 +49,8 @@ footer {
   /* background-color: #f8f9fa; */
   text-align: center;
   padding: 1rem;
-  position: fixed;
+  margin-top: auto; /* Dodane aby footer był przyklejony na dole */
   width: 100%;
-  bottom: 0;
 }
 
 /* Style dla alertów */
@@ -75,6 +74,11 @@ footer {
 .alert-error {
   background-color: #F4511E;
   color: #fffde7;
+}
+
+.alert-warning {
+  background-color: #f5ba13;
+  color: #333;
 }
 
 footer p {
@@ -149,6 +153,86 @@ form.create-note button {
   outline: none;
 }
 
+form h2 {
+  text-align: center;
+}
+
+form p.form-question {
+  margin: 20px auto;
+}
+
+/* Wyśrodkowanie nagłówka i pytania */
+.create-note h2,
+.create-note .form-question {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Stylizacja szczegółów notatki */
+.note-details {
+  margin-bottom: 30px;
+}
+
+.note-field {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.note-field label {
+  flex: 0 0 150px;
+  font-weight: bold;
+}
+
+.note-field span {
+  flex: 1;
+}
+
+/* Stylizacja przycisków */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.delete-button {
+  background-color: #4caf50;
+}
+
+.cancel-button {
+  background-color: #f4511e;
+}
+
+/* Efekt hover dla przycisków */
+.delete-button:hover {
+  background-color: #388e3c; /* Zielony kolor po najechaniu */
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f; /* Czerwony kolor po najechaniu */
+}
+
+.fab-edit-button:hover {
+  opacity: 0.9;
+}
+
+/* Dostosowanie odstępów dla pytania */
+.form-question {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+/* Responsywność dla mniejszych ekranów */
+@media (max-width: 480px) {
+  .note-field {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .note-field label {
+    margin-bottom: 5px;
+  }
+}
+
 /* My added styles */
 .wrapper {
   padding: 20px;
@@ -196,7 +280,7 @@ form.create-note button {
   position: absolute;
   right: 18px;
   bottom: -18px;
-  width: 80px; /* Możesz dostosować szerokość, aby zmieścić przyciski obok siebie */
+  width: 120px; /* Możesz dostosować szerokość, aby zmieścić przyciski obok siebie */
 }
 
 .fab-buttons-container2 {
@@ -206,4 +290,27 @@ form.create-note button {
   right: 18px;
   bottom: -18px;
 }
+
+.custom-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px; /* Dodaj odstęp od góry */
+}
+
+.custom-fab {
+  margin-top: 10px; /* Dodaj odstęp między tekstem a przyciskiem */
+}
+
+/* Dodaj odstęp w poziomie między elementem h2 a elementem Link */
+.left h2 {
+  margin-right: 10px; /* Dostosuj wartość odstępu */
+}
+
+.right h2 {
+  margin-right: 10px; /* Dostosuj wartość odstępu */
+}
+
 

@@ -137,7 +137,7 @@ function App() {
     setNotes((prevNotes) => {
       const updatedNotes = [...prevNotes, newNote];
       localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
-      handleAlert("noteAdded", "New note added successfully!");
+      handleAlert("success", "New note added successfully!");
       return updatedNotes;
     });
   }
@@ -157,9 +157,12 @@ function App() {
     });
   };
 
-  const cancelDelete = () => {
+  const cancelAction = () => {
     setIsDeleting(false); // Reset isDeleting state
     setNoteToDelete(null); // Reset the note being deleted
+    setIsEditing(false); // Reset isEditing state
+    setNoteToEdit(null); // Reset the note being edited
+    handleAlert("warning", "The action was canceled.");  
   };
 
   const editNote = (id) => {
@@ -178,6 +181,7 @@ function App() {
     setNoteToEdit(null);
   };
 
+
   return (
     <Router>
       <div className="app-container">
@@ -188,17 +192,13 @@ function App() {
           setAlert={handleAlert}
           setIsEditing={setIsEditing}
           setNoteToEdit={setNoteToEdit}
+          cancelAction={cancelAction}
         />
         <div className="content">
           {alert.visible ? (
             <div className={`alert alert-${alert.type}`}>{alert.message}</div>
           ) : null}
-          {/* {alert.visible ? (
-            <div className="main-panel-wrapper">
-              <h2>{alert.message}</h2>
-            </div>
-          ) : null} */}
-
+          
           {!isLoggedIn && !token ? (
             <div className="main-panel-wrapper">
               <Routes>
@@ -227,6 +227,7 @@ function App() {
                     note={noteToEdit}
                     onUpdate={updateNote}
                     setAlert={handleAlert}
+                    cancelAction={cancelAction}
                   />
                 </div>
               ) : isDeleting ? (
@@ -235,7 +236,7 @@ function App() {
                     note={noteToDelete}
                     onRemove={removeNote}
                     setAlert={handleAlert}
-                    cancelDelete={cancelDelete}
+                    cancelAction={cancelAction}
                   />
                 </div>
               ) : (

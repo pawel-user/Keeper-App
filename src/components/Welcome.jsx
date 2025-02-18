@@ -21,9 +21,10 @@ export default function Welcome() {
           <Link
             component={Link}
             to="/register"
-            style={{ textDecoration: "none", color: "inherit" }}
+            className="custom-link"
+            // style={{ textDecoration: "none", color: "inherit" }}
           >
-            <Fab>
+            <Fab className="custom-fab">
               <AppRegistrationIcon />
             </Fab>
           </Link>
@@ -33,10 +34,11 @@ export default function Welcome() {
           <Link
             component={Link}
             to="/login"
-            style={{ textDecoration: "none", color: "inherit" }}
+            className="custom-link"
+            // style={{ textDecoration: "none", color: "inherit" }}
             onClick={handleLogin}
           >
-            <Fab>
+            <Fab className="custom-fab">
               <LoginIcon />
             </Fab>
           </Link>

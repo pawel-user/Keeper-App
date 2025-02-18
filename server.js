@@ -44,24 +44,6 @@ const readFile = async (req, res, next) => {
   next();
 };
 
-// Wczytywanie danych użytkowników przy uruchomieniu serwera
-// const readFile = (req, res, next) => {
-//   fs.readFile(dbPath, "utf8", (error, data) => {
-//     if (error) {
-//       console.log("Error reading db.json:", error);
-//     }
-//     try {
-//       const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
-//       usersData = parsedData.users;
-//       notesData = parsedData.notes;
-//       // console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
-//     } catch (error) {
-//       console.log("Error parsing JSON:", error);
-//     }
-//   });
-//   next();
-// };
-
 // Middleware do ustawiania danych użytkowników w req.db
 const setUsersData = (req, res, next) => {
   if (usersData !== null) {

@@ -1,6 +1,6 @@
-
   .fab-edit-button,
-  .fab-clear-button {
+  .fab-clear-button,
+  .fab-cancel-button {
     font-size: 16px; /* Rozmiar czcionki */
     color: #ffffff; /* Kolor tekstu */
     background-color: #ffa726; /* Kolor tła */
@@ -8,7 +8,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100px; /* Szerokość przycisku */
-    height: 100px; /* Wysokość przycisku */
-  }
+    width: 80px; /* Szerokość przycisku */
+    height: 80px; /* Wysokość przycisku */
+    transition: background-color 0.3s ease; /* Płynna animacja zmiany koloru */
+}
+
+  /* Efekt hover dla przycisków */
+.delete-button:hover {
+  background-color: #388e3c; /* Zielony kolor po najechaniu */
+}
+
+.cancel-button:hover {
+  background-color: #d32f2f; /* Czerwony kolor po najechaniu */
+}
   

@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Zoom, Fab } from "@mui/material";
 import { deleteNote } from "../services/userNotes.js";
 import "../EditNote.css"; // Importuj plik CSS
+import { DeleteButton, CancelButton } from "../styles/styledButtons.js";
 
-function DeleteNote({ note, onRemove, setAlert, cancelDelete }) {
+
+function DeleteNote({ note, onRemove, setAlert, cancelAction }) {
   const [deletedNote, setDeletedNote] = useState(note);
   const navigate = useNavigate();
 
@@ -32,7 +34,7 @@ function DeleteNote({ note, onRemove, setAlert, cancelDelete }) {
 
   function handleCancel() {
     setAlert("error", "Delete canceled");
-    cancelDelete();  // Wywołaj funkcję cancelDelete przekazaną jako props
+    cancelAction(); // Wywołaj funkcję cancelAction przekazaną jako props
     navigate("/");
   }
 
@@ -40,50 +42,44 @@ function DeleteNote({ note, onRemove, setAlert, cancelDelete }) {
     <div>
       <form className="create-note" onSubmit={handleSubmit}>
         <h2>Delete User Note</h2>
-        <p>Are you sure to delete this note?</p>
-        <input
-          name="section"
-          value={deletedNote.section || ""}
-          placeholder="Section"
-          readOnly
-        />
-        <input
-          name="url"
-          value={deletedNote.url || ""}
-          placeholder="URL website address"
-          readOnly
-        />
-        <input
-          name="linkTitle"
-          value={deletedNote.linkTitle || ""}
-          placeholder="Title of the website link"
-          readOnly
-        />
-        <textarea
-          name="description"
-          value={deletedNote.description || ""}
-          placeholder="Take a note..."
-          rows={10}
-          readOnly
-        />
+        <p className="form-question">Are you sure to delete this note?</p>
 
-        <Fab
-          className="fab-edit-button"
-          type="submit"
-          color="primary"
-          aria-label="edit"
-        >
-          Yes
-        </Fab>
-        <Fab
-          className="fab-edit-button"
-          type="button"
-          color="primary"
-          aria-label="cancel"
-          onClick={handleCancel}
-        >
-          No
-        </Fab>
+        <div className="note-details">
+          <div className="note-field">
+            <label>Section:</label>
+            <span>{deletedNote.section || "No data"}</span>
+          </div>
+          <div className="note-field">
+            <label>Address URL:</label>
+            <span>{deletedNote.url || "No data"}</span>
+          </div>
+          <div className="note-field">
+            <label>Link Title:</label>
+            <span>{deletedNote.linkTitle || "No data"}</span>
+          </div>
+          <div className="note-field">
+            <label>Description:</label>
+            <span>{deletedNote.description || "No data"}</span>
+          </div>
+        </div>
+
+        <div className="button-group">
+          <DeleteButton
+            variant="contained"
+            type="submit"
+            aria-label="delete"
+          >
+            Yes
+          </DeleteButton>
+          <CancelButton
+            variant="contained"
+            type="button"
+            aria-label="cancel"
+            onClick={handleCancel}
+          >
+            No
+          </CancelButton>
+        </div>
       </form>
     </div>
   );
