@@ -22,7 +22,6 @@ export default function Welcome() {
             component={Link}
             to="/register"
             className="custom-link"
-            // style={{ textDecoration: "none", color: "inherit" }}
           >
             <Fab className="custom-fab">
               <AppRegistrationIcon />
@@ -35,7 +34,6 @@ export default function Welcome() {
             component={Link}
             to="/login"
             className="custom-link"
-            // style={{ textDecoration: "none", color: "inherit" }}
             onClick={handleLogin}
           >
             <Fab className="custom-fab">

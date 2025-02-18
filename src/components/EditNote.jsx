@@ -71,7 +71,6 @@ function EditNote({ note, onUpdate, setAlert, cancelAction }) {
 
   const clearInputs = (e) => {
     e.preventDefault();
-    console.log("Function clearInputs() called.");
     setEditedNote({
       section: "",
       url: "",

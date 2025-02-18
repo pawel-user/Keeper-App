@@ -241,7 +241,7 @@ function App() {
                 </div>
               ) : (
                 <>
-                  <CreateArea onAdd={addNote} setAlert={handleAlert} />
+                  <CreateArea onAdd={addNote} setAlert={handleAlert} cancelAction={cancelAction}/>
                   {notes && notes.length > 0 ? (
                     notes.map((noteItem, index) => (
                       <Note

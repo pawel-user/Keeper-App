@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { addNote } from "../services/userNotes.js";
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from '@mui/icons-material/Close';
 import { Zoom } from "@mui/material";
 import { Fab } from "@mui/material";
 
@@ -70,8 +71,35 @@ function CreateArea(props) {
     setExpanded(true);
   }
 
+  function toggle(isExpanded) {
+    setExpanded(!isExpanded);
+  }
+
+  function toggleClearAndCancel() {
+    setExpanded(false);
+    setNote({
+      section: "",
+      url: "",
+      linkTitle: "",
+      description: ""
+    });
+    props.cancelAction();
+  }
+
+  const clearInputs = (e) => {
+    e.preventDefault();
+    setNote({
+      section: "",
+      url: "",
+      linkTitle: "",
+      description: ""
+    });
+  };
+
+
+
   return (
-    <div>
+    <div className="create-note-area">
       <form className="create-note">
         {isExpanded ? (
           <input
@@ -102,7 +130,7 @@ function CreateArea(props) {
 
         <textarea
           name="description"
-          onClick={expand}
+          onClick={() => expand()}
           onChange={handleChange}
           value={note.description}
           placeholder="Take a note..."
@@ -112,6 +140,11 @@ function CreateArea(props) {
           <Zoom in={isExpanded}>
             <Fab onClick={submitNote}>
               <AddIcon />
+            </Fab>
+          </Zoom>
+          <Zoom in={isExpanded}>
+            <Fab onClick={toggleClearAndCancel}>
+              <CloseIcon />
             </Fab>
           </Zoom>
         </div>
