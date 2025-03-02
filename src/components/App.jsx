@@ -9,6 +9,7 @@ import Welcome from "./Welcome";
 import Login from "./Login";
 import Register from "./Register";
 import EditNote from "./EditNote";
+import DeleteNote from "./DeleteNote";
 import useToken from "./useToken";
 import { getUsers } from "../services/registeredUsers.js";
 import { getNotes } from "../services/userNotes.js";
@@ -19,12 +20,18 @@ function App() {
     message: "",
     visible: false,
   });
+  const [content, setContent] = useState({
+    type: "start",
+  });
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
   const [isLoggedIn, setLogin] = useState(!!token);
   const [isEditing, setIsEditing] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
+  const [isExpanded, setExpanded] = useState();
   const mounted = useRef(true);
   const fetchNotesCalled = useRef(false);
 
@@ -35,12 +42,18 @@ function App() {
       visible: true,
     });
     if (type === "noteAdded") {
-      setTimeout(reloadPage, 2000); // Wywołanie funkcji reloadPage z opóźnieniem 2 sekund
+      setTimeout(reloadPage, 2000);
     }
   };
 
+  const handleContent = (type) => {
+    setContent({
+      type,
+    });
+  };
+
   const reloadPage = () => {
-    window.location.reload(); // Wymuszenie przeładowania strony
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -48,7 +61,7 @@ function App() {
     if (!alert.visible) {
       return;
     }
-    if (alert.type === "login" || alert.type === "register") {
+    if (alert.type === "success") {
       getUsers().then((userItems) => {
         if (mounted.current) {
           setUsers(userItems || []);
@@ -84,24 +97,22 @@ function App() {
     async function fetchNotes() {
       if (token) {
         try {
-          // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
           const decodedToken = jwtDecode(token);
           const currentTime = Date.now() / 1000;
 
           if (decodedToken.exp < currentTime) {
-            // Token wygasł
             setToken(null);
             setLogin(false);
-            setIsEditing(false); // Resetowanie stanu isEditing
-            setNoteToEdit(null); // Resetowanie edytowanej notatki
+            setIsEditing(false);
+            setNoteToEdit(null);
             window.location.href = "/";
           } else {
             const fetchedNotes = await getNotes(token);
             if (fetchedNotes.status === 401) {
               setToken(null);
               setLogin(false);
-              setIsEditing(false); // Resetowanie stanu isEditing
-              setNoteToEdit(null); // Resetowanie edytowanej notatki
+              setIsEditing(false);
+              setNoteToEdit(null);
               window.location.href = "/";
             } else {
               setNotes(fetchedNotes);
@@ -111,8 +122,8 @@ function App() {
           console.error("Error decoding token or fetching notes:", error);
           setToken(null);
           setLogin(false);
-          setIsEditing(false); // Resetowanie stanu isEditing
-          setNoteToEdit(null); // Resetowanie edytowanej notatki
+          setIsEditing(false);
+          setNoteToEdit(null);
           window.location.href = "/";
         }
       }
@@ -124,33 +135,52 @@ function App() {
     }
   }, [isLoggedIn, token, setToken]);
 
-  // Update isLoggedIn when token changes
   useEffect(() => {
     setLogin(!!token);
   }, [token]);
 
-  // Funkcja addNote
   function addNote(newNote) {
     setNotes((prevNotes) => {
       const updatedNotes = [...prevNotes, newNote];
-      localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
-      handleAlert("noteAdded", "New note added successfully!");
+      localStorage.setItem("notes", JSON.stringify(updatedNotes));
+      handleAlert("success", "New note added successfully!");
       return updatedNotes;
     });
   }
 
-  function deleteNote(id) {
+  const deleteNote = (id) => {
+    const deleteNote = notes.find((noteItem, index) => index === id);
+    setNoteToDelete(deleteNote);
+    setIsDeleting(true);
+    handleContent("notes");
+    window.scrollTo(0, 0);
+  };
+
+  const removeNote = (id) => {
     setNotes((prevNotes) => {
-      return prevNotes.filter((noteItem, index) => {
-        return index !== id;
-      });
+      const updatedNotes = prevNotes.filter((noteItem, index) => index !== id);
+      setIsDeleting(false);
+      setNoteToDelete(null);
+      handleContent("home");
+      return updatedNotes;
     });
-  }
+  };
+
+  const cancelAction = () => {
+    setIsDeleting(false);
+    setNoteToDelete(null);
+    setIsEditing(false);
+    setNoteToEdit(null);
+    handleContent("home");
+    window.scrollTo(0, 0);
+  };
 
   const editNote = (id) => {
     const note = notes.find((noteItem, index) => index === id);
     setNoteToEdit(note);
     setIsEditing(true);
+    handleContent("notes");
+    window.scrollTo(0, 0);
   };
 
   const updateNote = (updatedNote) => {
@@ -161,72 +191,110 @@ function App() {
     );
     setIsEditing(false);
     setNoteToEdit(null);
+    handleContent("home");
+    window.scrollTo(0, 0);
   };
 
   return (
     <Router>
-      <div>
+      <div className="app-container">
         <Header
           isLoggedIn={isLoggedIn}
           setToken={setToken}
           setLogin={setLogin}
           setAlert={handleAlert}
+          setContent={handleContent}
           setIsEditing={setIsEditing}
+          setIsDeleting={setIsDeleting}
+          setExpanded={setExpanded}
           setNoteToEdit={setNoteToEdit}
         />
-        {alert.visible ? (
-          <div className="main-panel-wrapper">
-            <h2>{alert.message}</h2>
-          </div>
-        ) : null}
+        <div className={`content-${content.type}`}>
+          {alert.visible ? (
+            <div className={`alert alert-${alert.type}`}>{alert.message}</div>
+          ) : null}
 
-        {!isLoggedIn && !token ? (
-          <div className="main-panel-wrapper">
-            <Routes>
-              <Route path="" element={<Welcome />} />
-              <Route
-                path="/register"
-                element={<Register setAlert={handleAlert} />}
-              />
-              <Route
-                path="/login"
-                element={
-                  <Login
-                    setToken={setToken}
-                    setLogin={setLogin}
-                    setAlert={handleAlert}
-                  />
-                }
-              />
-            </Routes>
-          </div>
-        ) : (
-          <div>
-            {isEditing ? (
-              <div>
-                <EditNote note={noteToEdit} onUpdate={updateNote} setAlert={handleAlert} />
-              </div>
-            ) : (
-              <>
-                <CreateArea onAdd={addNote} setAlert={handleAlert} />
-                {notes.map((noteItem, index) => {
-                  return (
-                    <Note
-                      key={index}
-                      id={index}
-                      section={noteItem.section}
-                      linkTitle={noteItem.linkTitle}
-                      url={noteItem.url}
-                      description={noteItem.description}
-                      onEdit={editNote}
-                      onDelete={deleteNote}
+          {!isLoggedIn && !token ? (
+            <div className="main-panel-wrapper">
+              <Routes>
+                <Route path="" element={<Welcome />} />
+                <Route
+                  path="/register"
+                  element={
+                    <Register
+                      setAlert={handleAlert}
+                      setContent={handleContent}
                     />
-                  );
-                })}
-              </>
-            )}
-          </div>
-        )}
+                  }
+                />
+                <Route
+                  path="/login"
+                  element={
+                    <Login
+                      setToken={setToken}
+                      setLogin={setLogin}
+                      setContent={handleContent}
+                      setAlert={handleAlert}
+                    />
+                  }
+                />
+              </Routes>
+            </div>
+          ) : (
+            <div className="content">
+              {isEditing ? (
+                <div>
+                  <EditNote
+                    note={noteToEdit}
+                    onUpdate={updateNote}
+                    setAlert={handleAlert}
+                    setContent={handleContent}
+                    setIsEditing={setIsEditing}
+                    setIsDeleting={setIsDeleting}
+                  />
+                </div>
+              ) : isDeleting ? (
+                <div>
+                  <DeleteNote
+                    note={noteToDelete}
+                    onRemove={removeNote}
+                    setAlert={handleAlert}
+                    cancelAction={cancelAction}
+                  />
+                </div>
+              ) : (
+                <>
+                  <CreateArea
+                    onAdd={addNote}
+                    setAlert={handleAlert}
+                    setContent={handleContent}
+                    setExpanded={setExpanded}
+                    isExpanded={isExpanded}
+                  />
+                  {notes && notes.length > 0 ? (
+                    notes.map((noteItem, index) => (
+                      <Note
+                        key={index}
+                        id={index}
+                        section={noteItem.section}
+                        linkTitle={noteItem.linkTitle}
+                        url={noteItem.url}
+                        description={noteItem.description}
+                        onEdit={editNote}
+                        onDelete={deleteNote}
+                        setContent={handleContent}
+                      />
+                    ))
+                  ) : (
+                    <div className="main-panel-wrapper">
+                      <p>No notes available</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </div>
         <Footer />
       </div>
     </Router>

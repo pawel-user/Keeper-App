@@ -5,14 +5,17 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 function Note(props) {
   const navigate = useNavigate();
-  
+
   function handleEditClick(event) {
     event.preventDefault();
-    navigate("/notes/" + `${props.id+1}`);
+    navigate(`/notes/${props.id + 1}`);
     props.onEdit(props.id);
   }
-  function handleDeleteClick() {
+  function handleDeleteClick(event) {
+    event.preventDefault();
+    navigate(`/notes/${props.id + 1}`);
     props.onDelete(props.id);
+    props.setContent("notes");
   }
 
   const url = `${props.url}`;
@@ -22,12 +25,18 @@ function Note(props) {
       <h1>{props.section}</h1>
       <a href={url}>{props.linkTitle}</a>
       <p>{props.description}</p>
-      <button onClick={handleDeleteClick}>
-        <DeleteIcon />
-      </button>
       <Link
         component={Link}
-        to={`/note/edit/${props.id+1}`}
+        style={{ textDecoration: "none", color: "inherit" }}
+        onClick={handleDeleteClick}
+      >
+        <button onClick={handleDeleteClick}>
+          <DeleteIcon />
+        </button>
+      </Link>
+
+      <Link
+        component={Link}
         style={{ textDecoration: "none", color: "inherit" }}
         onClick={handleEditClick}
       >
