@@ -1,12 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Zoom, Fab } from "@mui/material";
-import {editNote} from "../services/userNotes.js";
+import { editNote } from "../services/userNotes.js";
 import EditIcon from "@mui/icons-material/Edit";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
-import CloseIcon from '@mui/icons-material/Close';
-import "../EditNote.css"; // Importuj plik CSS
+import CloseIcon from "@mui/icons-material/Close";
 
-function EditNote({ note, onUpdate, setAlert, cancelAction }) {
+function EditNote({ note, onUpdate, setAlert, setContent, setIsEditing, setIsDeleting}) {
+  const navigate = useNavigate();
+  
   const [isExpanded, setExpanded] = useState(false);
   const [editedNote, setEditedNote] = useState({
     section: "",
@@ -24,11 +26,24 @@ function EditNote({ note, onUpdate, setAlert, cancelAction }) {
     }));
   }
 
+  function handleCancel(event) {
+    event.preventDefault();
+    setAlert("warning", "Action was canceled.");
+    setContent("home");
+    setIsEditing(false);
+    setIsDeleting(false);
+    navigate("/");
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
-    // Sprawdzenie, czy wszystkie pola są wypełnione
-    if (!editedNote.section || !editedNote.linkTitle || !editedNote.url || !editedNote.description) {
+    if (
+      !editedNote.section ||
+      !editedNote.linkTitle ||
+      !editedNote.url ||
+      !editedNote.description
+    ) {
       setAlert(
         "error",
         "Empty fields detected! You need complete all input fields."
@@ -36,8 +51,7 @@ function EditNote({ note, onUpdate, setAlert, cancelAction }) {
       return;
     }
 
-    // Sprawdzenie czy adres URL jest w poprawnym formacie
-    const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
+    const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]+)?(\/[^\s]*)?$/;
     if (!urlRegex.test(editedNote.url)) {
       setAlert(
         "error",
@@ -46,24 +60,27 @@ function EditNote({ note, onUpdate, setAlert, cancelAction }) {
       return;
     }
 
-        try {
-          const response = await editNote(editedNote.id, editedNote);
-          if (response.status === 404) {
-            setAlert("error", "Note not found!");
-            return;
-          }
-          if (response.status === 400) {
-            setAlert("error", "Note with the website URL already exists.");
-            return;
-          }
-          if (response) {
-            onUpdate(editedNote);
-            setAlert("success", `Note with id  ${editedNote.id} was edited succesfully`);
-          }
-        } catch (error) {
-          console.error("Error while editing user note:", error);
-        }
+    try {
+      const response = await editNote(editedNote.id, editedNote);
+      if (response.status === 404) {
+        setAlert("error", "Note not found!");
+        return;
       }
+      if (response.status === 400) {
+        setAlert("error", "Note with the website URL already exists.");
+        return;
+      }
+      if (response) {
+        onUpdate(editedNote);
+        setAlert(
+          "success",
+          `Note with id  ${editedNote.id} was edited succesfully`
+        );
+      }
+    } catch (error) {
+      console.error("Error while editing user note:", error);
+    }
+  }
 
   function toggle(isExpanded) {
     setExpanded(!isExpanded);
@@ -75,7 +92,7 @@ function EditNote({ note, onUpdate, setAlert, cancelAction }) {
       section: "",
       url: "",
       linkTitle: "",
-      description: ""
+      description: "",
     });
   };
 
@@ -134,7 +151,7 @@ function EditNote({ note, onUpdate, setAlert, cancelAction }) {
           <Zoom in={true}>
             <Fab
               className="fab-cancel-button"
-              onClick={cancelAction}
+              onClick={handleCancel}
               color="primary"
               aria-label="clear"
             >

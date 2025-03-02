@@ -6,17 +6,40 @@ import HighlightIcon from "@mui/icons-material/Highlight";
 function Header(props) {
   const navigate = useNavigate();
 
-  function handleReturnToHome() {
-    props.cancelAction(); // Wywołaj funkcję cancelAction przekazaną jako props
+  const handleReturnToHome = (e) => {
+    e.preventDefault();
+    if (props.isLoggedIn) {
+      props.setContent("home");
+    } else {
+      props.setContent("start");
+    }
+    props.setIsEditing(false);
+    props.setIsDeleting(false);
+    props.setExpanded(false);
     navigate("/");
-  }
+  };
 
   return (
     <header>
-      <h1 onClick={handleReturnToHome}>
-        <HighlightIcon/> Keeper
-      </h1>
-        {props.isLoggedIn ? <Logout setLogin={props.setLogin} setToken={props.setToken} setAlert={props.setAlert} setIsEditing={props.setIsEditing} setNoteToEdit={props.setIsEditing} setIsDeleting={props.setIsDeleting}/> : null}
+      <nav className="navbar">
+        <a className="navbar-brand" href="/" onClick={handleReturnToHome}>
+          <HighlightIcon className="icon" />{" "}
+          <span className="brand-text">Web Keeper</span>
+        </a>
+        {props.isLoggedIn ? (
+          <div className="navbar-right">
+            <Logout
+              setLogin={props.setLogin}
+              setToken={props.setToken}
+              setAlert={props.setAlert}
+              setContent={props.setContent}
+              setIsEditing={props.setIsEditing}
+              setNoteToEdit={props.setIsEditing}
+              setIsDeleting={props.setIsDeleting}
+            />
+          </div>
+        ) : null}
+      </nav>
     </header>
   );
 }

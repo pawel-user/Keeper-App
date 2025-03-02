@@ -15,6 +15,7 @@ function Note(props) {
     event.preventDefault();
     navigate(`/notes/${props.id + 1}`);
     props.onDelete(props.id);
+    props.setContent("notes");
   }
 
   const url = `${props.url}`;

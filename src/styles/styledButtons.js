@@ -1,5 +1,4 @@
-// StyledButtons.js
-import { styled } from "@mui/material/styles/index.js"; // Zaktualizowany import dla styled
+import { styled } from "@mui/material/styles/index.js";
 import Button from "@mui/material/Button/index.js";
 
 export const DeleteButton = styled(Button)({

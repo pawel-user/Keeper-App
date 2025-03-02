@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Zoom, Fab } from "@mui/material";
 import { deleteNote } from "../services/userNotes.js";
-import "../EditNote.css"; // Importuj plik CSS
 import { DeleteButton, CancelButton } from "../styles/styledButtons.js";
-
 
 function DeleteNote({ note, onRemove, setAlert, cancelAction }) {
   const [deletedNote, setDeletedNote] = useState(note);
@@ -12,7 +9,6 @@ function DeleteNote({ note, onRemove, setAlert, cancelAction }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setAlert("success", "handleSubmit called");
 
     try {
       const response = await deleteNote(deletedNote.id);
@@ -34,7 +30,7 @@ function DeleteNote({ note, onRemove, setAlert, cancelAction }) {
 
   function handleCancel() {
     setAlert("error", "Delete canceled");
-    cancelAction(); // Wywołaj funkcję cancelAction przekazaną jako props
+    cancelAction();
     navigate("/");
   }
 
@@ -64,11 +60,7 @@ function DeleteNote({ note, onRemove, setAlert, cancelAction }) {
         </div>
 
         <div className="button-group">
-          <DeleteButton
-            variant="contained"
-            type="submit"
-            aria-label="delete"
-          >
+          <DeleteButton variant="contained" type="submit" aria-label="delete">
             Yes
           </DeleteButton>
           <CancelButton

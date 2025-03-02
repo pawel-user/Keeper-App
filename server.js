@@ -7,12 +7,12 @@ import { fileURLToPath } from "url";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-dotenv.config(); // Ładowanie zmiennych środowiskowych z pliku .env
+dotenv.config();
 
 const app = express();
 const port = 8080;
 export const API_URL = `http://localhost:${port}`;
-const SECRET_KEY = process.env.SECRET_KEY; // Odczytywanie SECRET_KEY z pliku konfiguracyjnego .env
+const SECRET_KEY = process.env.SECRET_KEY;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,7 +25,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, "db.json");
-// console.log(dbPath);
 
 let usersData = null;
 let notesData = null;
@@ -37,14 +36,12 @@ const readFile = async (req, res, next) => {
     const parsedData = data ? JSON.parse(data) : { users: [], notes: [] };
     usersData = parsedData.users;
     notesData = parsedData.notes;
-    // console.log("Data loaded once:", parsedData); // Logowanie danych tylko raz
   } catch (error) {
     console.log("Error reading db.json:", error);
   }
   next();
 };
 
-// Middleware do ustawiania danych użytkowników w req.db
 const setUsersData = (req, res, next) => {
   if (usersData !== null) {
     req.db = { users: usersData, notes: notesData };
@@ -61,20 +58,17 @@ app.get("/users", (req, res) => {
   res.send(req.db.users);
 });
 
-// Middleware do uwierzytelniania użytkownika
 const authenticateUser = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
-  // console.log("Token received in authenticateUser:", token); // Logowanie tokena
   if (!token) {
     return res.status(401).send("Access denied. No token provided.");
   }
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
-    // console.log("Decoded token:", decoded); // Logowanie zdekodowanego tokena
     req.user = decoded;
     next();
   } catch (error) {
-    console.error("Error verifying token:", error); // Logowanie błędu
+    console.error("Error verifying token:", error);
     if (error.name === "TokenExpiredError") {
       return res.status(401).send("Token expired. Please log in again.");
     }
@@ -83,24 +77,19 @@ const authenticateUser = (req, res, next) => {
   }
 };
 
-// Funkcja do pobierania notatek zalogowanego użytkownika
 app.get("/user/notes", authenticateUser, (req, res) => {
   const userNotes = req.db.notes.filter((note) => note.userId === req.user.id);
-  // console.log("userNotes: ", userNotes);
   res.send(userNotes);
 });
 
 app.post("/login", (req, res) => {
   try {
     const { username, password } = req.body;
-    // console.log("Received login data:", { username, password }); // Dodaj logowanie
-    // console.log("usersData=", usersData);
     const user = usersData.find(
       (userItem) =>
         userItem.username === username && userItem.password === password
     );
     if (user) {
-      // Generowanie tokena podczas logowania użytkownika
       const token = jwt.sign(
         { username: user.username, id: user.id },
         SECRET_KEY,
@@ -109,10 +98,10 @@ app.post("/login", (req, res) => {
       res.send({ token });
     } else if (usersData === null) {
       console.log("No saved users in the database");
-      res.status(400).json({ error: "No saved users in the database." }); // Zwracanie JSON zamiast tekstu
+      res.status(400).json({ error: "No saved users in the database." });
     } else {
       console.log("Invalid credentials");
-      res.status(401).json({ error: "Invalid credentials" }); // Zwracanie JSON zamiast tekstu
+      res.status(401).json({ error: "Invalid credentials" });
     }
   } catch (error) {
     console.error("Error in /login route:", error);
@@ -124,7 +113,6 @@ app.post("/register", (req, res) => {
   try {
     const uploadedUser = req.body;
 
-    // Walidacja danych użytkownika
     if (
       !uploadedUser.username ||
       !uploadedUser.email ||
@@ -134,14 +122,11 @@ app.post("/register", (req, res) => {
       return res.status(400).send("All fields are required");
     }
 
-    // Sprawdzenie czy email jest w poprawnym formacie
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(uploadedUser.email)) {
-      // console.log("Invalid email format!");
       return res.status(400).send("Invalid email format");
     }
 
-    // Sprawdzenie czy dany użytkownik już istnieje
     const userExists = req.db.users.find(
       (userItem) =>
         userItem.username === uploadedUser.username ||
@@ -156,26 +141,23 @@ app.post("/register", (req, res) => {
       return res.status(400).send("User credentials failed");
     }
 
-    // Generowanie unikalnego identyfikatora dla nowego zarejestrowanego użytkownika
     const newId =
       req.db.users.length > 0
         ? req.db.users.reduce((maxId, user) => Math.max(maxId, user.id), 0) + 1
         : 1;
 
-    // Generate a token
     const token = jwt.sign(
       { username: uploadedUser.username, id: newId },
       SECRET_KEY,
       { expiresIn: "1h" }
     );
 
-    // Nowy użytkownik bez repeatedPassword
     const newUser = {
       id: newId,
       username: uploadedUser.username,
       email: uploadedUser.email,
       password: uploadedUser.password,
-      token, // Assign generated token
+      token,
     };
     req.db.users.push(newUser);
 
@@ -202,31 +184,29 @@ app.post("/register", (req, res) => {
 app.post("/add/note", authenticateUser, (req, res) => {
   try {
     const uploadedNote = req.body;
-    // console.log("New note data received:", uploadedNote);
 
     const userNotes = req.db.notes.filter(
       (note) => note.userId === req.user.id
     );
 
-    // Sprawdzenie czy dany adres strony już istnieje w notatkach dla zarejestrowanego użytkownika
     const noteUrlExists = userNotes.find(
       (noteItem) => noteItem.url === uploadedNote.url
     );
 
     if (noteUrlExists) {
-      return res.status(400).json({ message: "Note with the website URL already exists" });
+      return res
+        .status(400)
+        .json({ message: "Note with the website URL already exists" });
     }
 
-    // Generowanie unikalnego identyfikatora dla nowej notatki dla zarejestrowanego użytkownika
     const newId =
       req.db.notes.length > 0
         ? req.db.notes.reduce((maxId, note) => Math.max(maxId, note.id), 0) + 1
         : 1;
 
-    // Nowa notatka użytkownika
     const newNote = {
       id: newId,
-      userId: req.user.id, // Ustawienie userId jako id zalogowanego użytkownika
+      userId: req.user.id,
       section: uploadedNote.section,
       linkTitle: uploadedNote.linkTitle,
       url: uploadedNote.url,
@@ -253,7 +233,6 @@ app.post("/add/note", authenticateUser, (req, res) => {
   }
 });
 
-// PATCH a note when you just want to update one parameter
 app.patch("/notes/:id", authenticateUser, (req, res) => {
   const noteId = parseInt(req.params.id);
   const noteIndex = notesData.findIndex((note) => note.id === noteId);
@@ -262,54 +241,49 @@ app.patch("/notes/:id", authenticateUser, (req, res) => {
     return res.status(404).send("Note not found.");
   }
 
-  // Zaktualizuj właściwości notatki na podstawie danych w żądaniu
   if (req.body.section) notesData[noteIndex].section = req.body.section;
   if (req.body.linkTitle) notesData[noteIndex].linkTitle = req.body.linkTitle;
   if (req.body.url) notesData[noteIndex].url = req.body.url;
   if (req.body.description)
     notesData[noteIndex].description = req.body.description;
 
-  // Zaktualizuj całą strukturę JSON i zapisz do pliku db.json
   const updatedData = {
-    users: usersData, // Zapisz użytkowników bez zmian
-    notes: notesData, // Zaktualizowana tablica notatek
+    users: usersData,
+    notes: notesData,
   };
 
-  // Zapisz zaktualizowane dane do pliku db.json
   fs.writeFile(dbPath, JSON.stringify(updatedData, null, 2), (err) => {
     if (err) {
       console.error("Error writing to db.json:", err);
       return res.status(500).send("Internal Server Error");
     }
     console.log("Data successfully written to db.json");
-    // Dodaj krótkie opóźnienie, aby upewnić się, że dane są w pełni zapisane
     setTimeout(() => {
       res.json(notesData[noteIndex]);
     }, 100);
   });
 });
 
-// Usuń post użytkownika o określonym id
-app.delete("/notes/:id",authenticateUser, (req, res) => {
-  const noteIndex = notesData.findIndex((p) => p.id === parseInt(req.params.id));
-  if (noteIndex === -1) return res.status(404).json({ message: "Note not found" });
+app.delete("/notes/:id", authenticateUser, (req, res) => {
+  const noteIndex = notesData.findIndex(
+    (p) => p.id === parseInt(req.params.id)
+  );
+  if (noteIndex === -1)
+    return res.status(404).json({ message: "Note not found" });
 
   notesData.splice(noteIndex, 1);
 
-    // Zaktualizuj całą strukturę JSON i zapisz do pliku db.json
-    const updatedData = {
-      users: usersData, // Zapisz użytkowników bez zmian
-      notes: notesData, // Zaktualizowana tablica notatek
-    };
-  
-  // Zapisz zaktualizowane dane do pliku db.json
+  const updatedData = {
+    users: usersData,
+    notes: notesData,
+  };
+
   fs.writeFile(dbPath, JSON.stringify(updatedData, null, 2), (err) => {
     if (err) {
       console.error("Error writing to db.json:", err);
       return res.status(500).send("Internal Server Error");
     }
     console.log("Data successfully written to db.json");
-    // Dodaj krótkie opóźnienie, aby upewnić się, że dane są w pełni zapisane
     setTimeout(() => {
       res.json({ message: "Post deleted" });
     }, 100);

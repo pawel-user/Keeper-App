@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { addNote } from "../services/userNotes.js";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from '@mui/icons-material/Close';
+import WrapTextIcon from "@mui/icons-material/WrapText";
+import CloseIcon from "@mui/icons-material/Close";
 import { Zoom } from "@mui/material";
 import { Fab } from "@mui/material";
 
 function CreateArea(props) {
-  const [isExpanded, setExpanded] = useState(false);
-
   const [note, setNote] = useState({
     section: "",
     linkTitle: "",
@@ -28,7 +27,6 @@ function CreateArea(props) {
 
   async function submitNote(event) {
     event.preventDefault();
-    // Sprawdzenie, czy wszystkie pola są wypełnione
     if (!note.section || !note.linkTitle || !note.url || !note.description) {
       props.setAlert(
         "error",
@@ -37,8 +35,7 @@ function CreateArea(props) {
       return;
     }
 
-    // Sprawdzenie czy adres URL jest w poprawnym formacie
-    const urlRegex = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
+    const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9.-]+)(:[0-9]+)?(\/[^\s]*)?$/;
     if (!urlRegex.test(note.url)) {
       props.setAlert(
         "error",
@@ -60,48 +57,47 @@ function CreateArea(props) {
       }
     } catch (error) {
       console.error("Error while adding new user note:", error);
-      if (error.response && error.response.status === 400 && error.response.data.message === "Note with the website URL already exists") {
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.message ===
+          "Note with the website URL already exists"
+      ) {
         props.setAlert("error", "Note with the website URL already exists!");
       } else {
-        props.setAlert("error", "Error while adding new user note. Please try again.");
-      }    }
+        props.setAlert(
+          "error",
+          "Error while adding new user note. Please try again."
+        );
+      }
+    }
+  }
+
+  function toggle() {
+    props.setExpanded(!props.isExpanded);
+    props.setContent("home");
   }
 
   function expand() {
-    setExpanded(true);
-  }
-
-  function toggle(isExpanded) {
-    setExpanded(!isExpanded);
+    props.setExpanded(true);
+    props.setContent("home");
   }
 
   function toggleClearAndCancel() {
-    setExpanded(false);
+    props.setExpanded(false);
     setNote({
       section: "",
       url: "",
       linkTitle: "",
-      description: ""
+      description: "",
     });
-    props.cancelAction();
+    props.setAlert("warning", "The action was canceled.");
   }
-
-  const clearInputs = (e) => {
-    e.preventDefault();
-    setNote({
-      section: "",
-      url: "",
-      linkTitle: "",
-      description: ""
-    });
-  };
-
-
 
   return (
     <div className="create-note-area">
       <form className="create-note">
-        {isExpanded ? (
+        {props.isExpanded ? (
           <input
             name="section"
             onChange={handleChange}
@@ -110,7 +106,7 @@ function CreateArea(props) {
           />
         ) : null}
 
-        {isExpanded ? (
+        {props.isExpanded ? (
           <input
             name="url"
             onChange={handleChange}
@@ -119,7 +115,7 @@ function CreateArea(props) {
           />
         ) : null}
 
-        {isExpanded ? (
+        {props.isExpanded ? (
           <input
             name="linkTitle"
             onChange={handleChange}
@@ -134,15 +130,20 @@ function CreateArea(props) {
           onChange={handleChange}
           value={note.description}
           placeholder="Take a note..."
-          rows={isExpanded ? 6 : 1}
+          rows={props.isExpanded ? 6 : 1}
         />
         <div className="fab-buttons-container2">
-          <Zoom in={isExpanded}>
+          <Zoom in={props.isExpanded}>
             <Fab onClick={submitNote}>
               <AddIcon />
             </Fab>
           </Zoom>
-          <Zoom in={isExpanded}>
+          <Zoom in={props.isExpanded}>
+            <Fab onClick={() => toggle(props.isExpanded)}>
+              <WrapTextIcon />
+            </Fab>
+          </Zoom>
+          <Zoom in={props.isExpanded}>
             <Fab onClick={toggleClearAndCancel}>
               <CloseIcon />
             </Fab>

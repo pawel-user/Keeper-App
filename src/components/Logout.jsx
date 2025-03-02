@@ -2,30 +2,6 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {logoutUser} from "../services/loggedUsers.js";
 import LogoutIcon from "@mui/icons-material/Logout";
-// import axios from "axios";
-
-
-// async function logoutUser(token) {
-//   if (!token) {
-//     throw new Error("No token, user is already logged out.");
-//   }
-//   try {
-//     const response = await axios.post(
-//       "http://localhost:8080/logout",
-//       {},
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
-//         },
-//       }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error while logging out:", error);
-//     throw error;
-//   }
-// }
 
 export default function Logout(props) {
   const navigate = useNavigate();
@@ -40,10 +16,11 @@ export default function Logout(props) {
     await logoutUser(token);
     props.setLogin(false);
     props.setToken("");
-    props.setIsEditing(false); // Resetowanie stanu isEditing
-    props.setNoteToEdit(null); // Resetowanie edytowanej notatki
+    props.setIsEditing(false);
+    props.setNoteToEdit(null);
     localStorage.removeItem("token");
     props.setAlert("success", "Logout successful");
+    props.setContent("start");
     navigate("/");
     return true;
   };
@@ -51,7 +28,7 @@ export default function Logout(props) {
   return (
     <h2>
       <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-        <button variant="contained" onClick={handleLogout}>
+        <button variant="contained" onClick={handleLogout} className="logout-button">
           <LogoutIcon />
         </button>
       </Link>

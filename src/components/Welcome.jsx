@@ -14,15 +14,11 @@ export default function Welcome() {
 
   return (
     <div>
-      <h1>Welcome to the Keeper App!</h1>
+      <h1>Welcome to the Web Keeper App!</h1>
       <div className="container">
         <div className="left">
           <h2>Register</h2>
-          <Link
-            component={Link}
-            to="/register"
-            className="custom-link"
-          >
+          <Link component={Link} to="/register" className="custom-link">
             <Fab className="custom-fab">
               <AppRegistrationIcon />
             </Fab>

@@ -20,6 +20,9 @@ function App() {
     message: "",
     visible: false,
   });
+  const [content, setContent] = useState({
+    type: "start",
+  });
   const [notes, setNotes] = useState([]);
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
@@ -28,6 +31,7 @@ function App() {
   const [noteToEdit, setNoteToEdit] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState(null);
+  const [isExpanded, setExpanded] = useState();
   const mounted = useRef(true);
   const fetchNotesCalled = useRef(false);
 
@@ -38,12 +42,18 @@ function App() {
       visible: true,
     });
     if (type === "noteAdded") {
-      setTimeout(reloadPage, 2000); // Wywołanie funkcji reloadPage z opóźnieniem 2 sekund
+      setTimeout(reloadPage, 2000);
     }
   };
 
+  const handleContent = (type) => {
+    setContent({
+      type,
+    });
+  };
+
   const reloadPage = () => {
-    window.location.reload(); // Wymuszenie przeładowania strony
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -87,24 +97,22 @@ function App() {
     async function fetchNotes() {
       if (token) {
         try {
-          // Dekodowanie tokena, aby sprawdzić czas wygaśnięcia
           const decodedToken = jwtDecode(token);
           const currentTime = Date.now() / 1000;
 
           if (decodedToken.exp < currentTime) {
-            // Token wygasł
             setToken(null);
             setLogin(false);
-            setIsEditing(false); // Resetowanie stanu isEditing
-            setNoteToEdit(null); // Resetowanie edytowanej notatki
+            setIsEditing(false);
+            setNoteToEdit(null);
             window.location.href = "/";
           } else {
             const fetchedNotes = await getNotes(token);
             if (fetchedNotes.status === 401) {
               setToken(null);
               setLogin(false);
-              setIsEditing(false); // Resetowanie stanu isEditing
-              setNoteToEdit(null); // Resetowanie edytowanej notatki
+              setIsEditing(false);
+              setNoteToEdit(null);
               window.location.href = "/";
             } else {
               setNotes(fetchedNotes);
@@ -114,8 +122,8 @@ function App() {
           console.error("Error decoding token or fetching notes:", error);
           setToken(null);
           setLogin(false);
-          setIsEditing(false); // Resetowanie stanu isEditing
-          setNoteToEdit(null); // Resetowanie edytowanej notatki
+          setIsEditing(false);
+          setNoteToEdit(null);
           window.location.href = "/";
         }
       }
@@ -127,16 +135,14 @@ function App() {
     }
   }, [isLoggedIn, token, setToken]);
 
-  // Update isLoggedIn when token changes
   useEffect(() => {
     setLogin(!!token);
   }, [token]);
 
-  // Funkcja addNote
   function addNote(newNote) {
     setNotes((prevNotes) => {
       const updatedNotes = [...prevNotes, newNote];
-      localStorage.setItem("notes", JSON.stringify(updatedNotes)); // Zapisanie notatek w localStorage
+      localStorage.setItem("notes", JSON.stringify(updatedNotes));
       handleAlert("success", "New note added successfully!");
       return updatedNotes;
     });
@@ -145,30 +151,36 @@ function App() {
   const deleteNote = (id) => {
     const deleteNote = notes.find((noteItem, index) => index === id);
     setNoteToDelete(deleteNote);
-    setIsDeleting(true); // Ustaw isDeleting na true
+    setIsDeleting(true);
+    handleContent("notes");
+    window.scrollTo(0, 0);
   };
 
   const removeNote = (id) => {
     setNotes((prevNotes) => {
       const updatedNotes = prevNotes.filter((noteItem, index) => index !== id);
-      setIsDeleting(false); // Set isDeleting to false after deletion
+      setIsDeleting(false);
       setNoteToDelete(null);
-      return updatedNotes; // Zwróć zaktualizowaną tablicę notatek
+      handleContent("home");
+      return updatedNotes;
     });
   };
 
   const cancelAction = () => {
-    setIsDeleting(false); // Reset isDeleting state
-    setNoteToDelete(null); // Reset the note being deleted
-    setIsEditing(false); // Reset isEditing state
-    setNoteToEdit(null); // Reset the note being edited
-    handleAlert("warning", "The action was canceled.");  
+    setIsDeleting(false);
+    setNoteToDelete(null);
+    setIsEditing(false);
+    setNoteToEdit(null);
+    handleContent("home");
+    window.scrollTo(0, 0);
   };
 
   const editNote = (id) => {
     const note = notes.find((noteItem, index) => index === id);
     setNoteToEdit(note);
     setIsEditing(true);
+    handleContent("notes");
+    window.scrollTo(0, 0);
   };
 
   const updateNote = (updatedNote) => {
@@ -179,8 +191,9 @@ function App() {
     );
     setIsEditing(false);
     setNoteToEdit(null);
+    handleContent("home");
+    window.scrollTo(0, 0);
   };
-
 
   return (
     <Router>
@@ -190,22 +203,29 @@ function App() {
           setToken={setToken}
           setLogin={setLogin}
           setAlert={handleAlert}
+          setContent={handleContent}
           setIsEditing={setIsEditing}
+          setIsDeleting={setIsDeleting}
+          setExpanded={setExpanded}
           setNoteToEdit={setNoteToEdit}
-          cancelAction={cancelAction}
         />
-        <div className="content">
+        <div className={`content-${content.type}`}>
           {alert.visible ? (
             <div className={`alert alert-${alert.type}`}>{alert.message}</div>
           ) : null}
-          
+
           {!isLoggedIn && !token ? (
             <div className="main-panel-wrapper">
               <Routes>
                 <Route path="" element={<Welcome />} />
                 <Route
                   path="/register"
-                  element={<Register setAlert={handleAlert} />}
+                  element={
+                    <Register
+                      setAlert={handleAlert}
+                      setContent={handleContent}
+                    />
+                  }
                 />
                 <Route
                   path="/login"
@@ -213,6 +233,7 @@ function App() {
                     <Login
                       setToken={setToken}
                       setLogin={setLogin}
+                      setContent={handleContent}
                       setAlert={handleAlert}
                     />
                   }
@@ -227,7 +248,9 @@ function App() {
                     note={noteToEdit}
                     onUpdate={updateNote}
                     setAlert={handleAlert}
-                    cancelAction={cancelAction}
+                    setContent={handleContent}
+                    setIsEditing={setIsEditing}
+                    setIsDeleting={setIsDeleting}
                   />
                 </div>
               ) : isDeleting ? (
@@ -241,7 +264,13 @@ function App() {
                 </div>
               ) : (
                 <>
-                  <CreateArea onAdd={addNote} setAlert={handleAlert} cancelAction={cancelAction}/>
+                  <CreateArea
+                    onAdd={addNote}
+                    setAlert={handleAlert}
+                    setContent={handleContent}
+                    setExpanded={setExpanded}
+                    isExpanded={isExpanded}
+                  />
                   {notes && notes.length > 0 ? (
                     notes.map((noteItem, index) => (
                       <Note
@@ -253,6 +282,7 @@ function App() {
                         description={noteItem.description}
                         onEdit={editNote}
                         onDelete={deleteNote}
+                        setContent={handleContent}
                       />
                     ))
                   ) : (
