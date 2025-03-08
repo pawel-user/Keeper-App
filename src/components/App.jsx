@@ -23,7 +23,10 @@ function App() {
   const [content, setContent] = useState({
     type: "start",
   });
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(() => {
+    const savedNotes = localStorage.getItem("notes");
+    return savedNotes ? JSON.parse(savedNotes) : [];
+  });
   const [users, setUsers] = useState([]);
   const { token, setToken } = useToken();
   const [isLoggedIn, setLogin] = useState(!!token);
@@ -99,7 +102,7 @@ function App() {
         try {
           const decodedToken = jwtDecode(token);
           const currentTime = Date.now() / 1000;
-
+  
           if (decodedToken.exp < currentTime) {
             setToken(null);
             setLogin(false);
@@ -128,16 +131,22 @@ function App() {
         }
       }
     }
-
-    if (isLoggedIn && token && !fetchNotesCalled.current) {
-      fetchNotesCalled.current = true;
+  
+    if (isLoggedIn && token) {
       fetchNotes();
     }
   }, [isLoggedIn, token, setToken]);
-
+  
   useEffect(() => {
     setLogin(!!token);
   }, [token]);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
 
   function addNote(newNote) {
     setNotes((prevNotes) => {

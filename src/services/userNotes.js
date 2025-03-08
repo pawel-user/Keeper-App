@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const port = 8080;
-const API_URL = `http://localhost:${port}`;
+const API_URL = process.env.REACT_APP_API_URL || `http://localhost:${port}`;
 
 export async function getNotes(token) {
   try {
