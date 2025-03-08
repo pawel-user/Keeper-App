@@ -284,7 +284,7 @@ form p.form-question {
   padding: 20px;
 }
 
-.main-panel-wrapper, .login-wrapper {
+.main-panel-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -307,6 +307,23 @@ form p.form-question {
 .container {
   display: flex;
   height: 20vh;
+}
+
+.welcome-container, .register-container, .login-container {
+  align-items: center;
+  position: fixed;
+}
+
+.delete-container, .edit-container {
+  align-items: center;
+  position: fixed;
+  width: 100%;
+}
+
+.info-container {
+  text-align: center;
+  position: fixed;
+  width: 100%;
 }
 
 .left, .right { 

@@ -35,7 +35,7 @@ function DeleteNote({ note, onRemove, setAlert, cancelAction }) {
   }
 
   return (
-    <div>
+    <div className="delete-container">
       <form className="create-note" onSubmit={handleSubmit}>
         <h2>Delete User Note</h2>
         <p className="form-question">Are you sure to delete this note?</p>

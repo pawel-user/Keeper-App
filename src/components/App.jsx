@@ -295,7 +295,7 @@ function App() {
                       />
                     ))
                   ) : (
-                    <div className="main-panel-wrapper">
+                    <div className="info-container">
                       <p>No notes available</p>
                     </div>
                   )}

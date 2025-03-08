@@ -36,7 +36,7 @@ export default function Login({ setToken, setLogin, setAlert, setContent }) {
   };
 
   return (
-    <div className="login-wrapper">
+    <div className="login-container">
       <form onSubmit={handleSubmit}>
         <h2>Log In Panel</h2>
         <div className="form-group">

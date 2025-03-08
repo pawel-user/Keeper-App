@@ -97,7 +97,7 @@ function EditNote({ note, onUpdate, setAlert, setContent, setIsEditing, setIsDel
   };
 
   return (
-    <div>
+    <div className="edit-container">
       <form className="create-note" onSubmit={handleSubmit}>
         <h2>Edit User Note</h2>
         <input

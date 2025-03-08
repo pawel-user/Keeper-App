@@ -1,4 +1,21 @@
 {
-  "users": [],
-  "notes": []
+  "users": [
+    {
+      "id": 1,
+      "username": "pawel",
+      "email": "rik1986@o2.pl",
+      "password": "123",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBhd2VsIiwiaWQiOjEsImlhdCI6MTc0MTQxMzE1NywiZXhwIjoxNzQxNDE2NzU3fQ.YtCQy5jPHz4cvhT4fRE_73RM278GttoXfeczGIZ-WYM"
+    }
+  ],
+  "notes": [
+    {
+      "id": 1,
+      "userId": 1,
+      "section": "Technologie Webowe",
+      "linkTitle": "sd",
+      "url": "https://www.wp.pl",
+      "description": "d"
+    }
+  ]
 }

@@ -13,7 +13,7 @@ export default function Welcome() {
   };
 
   return (
-    <div>
+    <div className="welcome-container">
       <h1>Welcome to the Web Keeper App!</h1>
       <div className="container">
         <div className="left">

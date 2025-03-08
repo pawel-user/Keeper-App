@@ -72,7 +72,7 @@ export default function Register(props) {
   };
 
   return (
-    <div className="main-panel-wrapper">
+    <div className="register-container">
       <form onSubmit={handleSubmit}>
         <h2>Sign Up Panel</h2>
         <div className="form-group">
