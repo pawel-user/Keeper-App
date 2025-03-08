@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 const port = 8080;
-export const API_URL = `http://localhost:${port}`;
+export const API_URL = process.env.REACT_APP_API_URL || `http://localhost:${port}`;
 const SECRET_KEY = process.env.SECRET_KEY;
 
 // Middleware
