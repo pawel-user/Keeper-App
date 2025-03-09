@@ -54,6 +54,7 @@ function CreateArea(props) {
           url: "",
           description: "",
         });
+        props.setExpanded(false);
       }
     } catch (error) {
       console.error("Error while adding new user note:", error);
