@@ -21,7 +21,7 @@ function App() {
     visible: false,
   });
   const [content, setContent] = useState({
-    type: "home",
+    type: "start",
   });
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
@@ -59,6 +59,12 @@ function App() {
     window.location.reload();
   };
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      setContent({ type: "home" });
+    }
+  }, [isLoggedIn]);
+  
   useEffect(() => {
     mounted.current = true;
     if (!alert.visible) {
