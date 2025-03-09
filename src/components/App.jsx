@@ -21,7 +21,7 @@ function App() {
     visible: false,
   });
   const [content, setContent] = useState({
-    type: "start",
+    type: "home",
   });
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
@@ -102,7 +102,7 @@ function App() {
         try {
           const decodedToken = jwtDecode(token);
           const currentTime = Date.now() / 1000;
-  
+
           if (decodedToken.exp < currentTime) {
             setToken(null);
             setLogin(false);
@@ -111,14 +111,9 @@ function App() {
             window.location.href = "/";
           } else {
             const fetchedNotes = await getNotes(token);
-            if (fetchedNotes.status === 401) {
-              setToken(null);
-              setLogin(false);
-              setIsEditing(false);
-              setNoteToEdit(null);
-              window.location.href = "/";
-            } else {
-              setNotes(fetchedNotes);
+            if (fetchedNotes && fetchedNotes.length > 0) {
+              setNotes(fetchedNotes); 
+              localStorage.setItem("notes", JSON.stringify(fetchedNotes));
             }
           }
         } catch (error) {
@@ -131,22 +126,21 @@ function App() {
         }
       }
     }
-  
-    if (isLoggedIn && token) {
-      fetchNotes();
-    }
-  }, [isLoggedIn, token, setToken]);
-  
-  useEffect(() => {
-    setLogin(!!token);
-  }, [token]);
 
-  useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (savedToken) {
       setToken(savedToken);
+      setLogin(true);
     }
-  }, []);
+
+    if (savedToken) {
+      fetchNotes();
+    }
+  }, [token, setToken]);
+
+  useEffect(() => {
+    setLogin(!!token);
+  }, [token]);
 
   function addNote(newNote) {
     setNotes((prevNotes) => {
