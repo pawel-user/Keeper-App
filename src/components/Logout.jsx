@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {logoutUser} from "../services/loggedUsers.js";
+import { logoutUser } from "../services/loggedUsers.js";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function Logout(props) {
@@ -18,7 +18,6 @@ export default function Logout(props) {
     props.setToken("");
     props.setIsEditing(false);
     props.setNoteToEdit(null);
-    localStorage.removeItem("token");
     props.setAlert("success", "Logout successful");
     props.setContent("start");
     navigate("/");
@@ -27,11 +26,13 @@ export default function Logout(props) {
 
   return (
     <h2>
-      <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-        <button variant="contained" onClick={handleLogout} className="logout-button">
-          <LogoutIcon />
-        </button>
-      </Link>
+      <button
+        variant="contained"
+        onClick={handleLogout}
+        className="logout-button"
+      >
+        <LogoutIcon />
+      </button>
     </h2>
   );
 }

@@ -128,7 +128,7 @@ export default function Register(props) {
           </label>
         </div>
 
-        <div class="button-container">
+        <div className="button-container">
           <button type="submit" className="btn btn-dark">
             Sign up
           </button>

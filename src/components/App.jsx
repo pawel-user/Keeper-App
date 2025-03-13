@@ -36,7 +36,6 @@ function App() {
   const [noteToDelete, setNoteToDelete] = useState(null);
   const [isExpanded, setExpanded] = useState();
   const mounted = useRef(true);
-  const fetchNotesCalled = useRef(false);
 
   const handleAlert = (type, message) => {
     setAlert({
@@ -64,7 +63,7 @@ function App() {
       setContent({ type: "home" });
     }
   }, [isLoggedIn]);
-  
+
   useEffect(() => {
     mounted.current = true;
     if (!alert.visible) {
@@ -83,7 +82,7 @@ function App() {
           }
         });
       } else {
-        console.error("Token is null or does not exists");
+        console.log("Token is empty.");
       }
     }
     return () => (mounted.current = false);
@@ -110,7 +109,7 @@ function App() {
           const currentTime = Date.now() / 1000;
 
           if (decodedToken.exp < currentTime) {
-            setToken(null);
+            setToken("");
             setLogin(false);
             setIsEditing(false);
             setNoteToEdit(null);
@@ -118,13 +117,13 @@ function App() {
           } else {
             const fetchedNotes = await getNotes(token);
             if (fetchedNotes && fetchedNotes.length > 0) {
-              setNotes(fetchedNotes); 
+              setNotes(fetchedNotes);
               localStorage.setItem("notes", JSON.stringify(fetchedNotes));
             }
           }
         } catch (error) {
           console.error("Error decoding token or fetching notes:", error);
-          setToken(null);
+          setToken("");
           setLogin(false);
           setIsEditing(false);
           setNoteToEdit(null);

@@ -33,7 +33,7 @@ export async function loginUser(credentials, setAlert) {
     }
     try {
       const response = await axios.post(
-        "http://localhost:8080/logout",
+        `${API_URL}/logout`,
         {},
         {
           headers: {

@@ -24,7 +24,6 @@ export default function Login({ setToken, setLogin, setAlert, setContent }) {
       setContent("home");
       navigate("/");
     } catch (error) {
-      // `setAlert` is already called in `loginUser` in case of error
     }
     return true;
   };
