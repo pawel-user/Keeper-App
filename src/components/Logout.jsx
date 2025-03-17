@@ -8,20 +8,29 @@ export default function Logout(props) {
 
   const handleLogout = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token, user is already logged out.");
-      return;
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token, user is already logged out.");
+        return;
+      }
+      await logoutUser(token);
+      props.setLogin(false);
+      props.setToken("");
+      props.setIsEditing(false);
+      props.setNoteToEdit(null);
+      props.setAlert("success", "Logout successful");
+      props.setContent("start");
+      props.setNotes([]);
+      localStorage.removeItem("notes");
+      localStorage.removeItem("token");
+      localStorage.removeItem("userData");
+      sessionStorage.clear();
+      navigate("/");      
+    } catch (error) {
+      console.error("Error during logout:", error);
+      props.setAlert("error", "Logout failed. Please try again.");
     }
-    await logoutUser(token);
-    props.setLogin(false);
-    props.setToken("");
-    props.setIsEditing(false);
-    props.setNoteToEdit(null);
-    props.setAlert("success", "Logout successful");
-    props.setContent("start");
-    navigate("/");
-    return true;
   };
 
   return (

@@ -20,7 +20,6 @@ app.use(bodyParser.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
-// Uzyskanie __dirname w module ES
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -29,7 +28,6 @@ const dbPath = path.join(__dirname, "db.json");
 let usersData = null;
 let notesData = null;
 
-// Wczytywanie danych użytkowników przy uruchomieniu serwera
 const readFile = async (req, res, next) => {
   try {
     const data = await fs.promises.readFile(dbPath, "utf8");

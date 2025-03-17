@@ -113,13 +113,18 @@ function App() {
             setLogin(false);
             setIsEditing(false);
             setNoteToEdit(null);
+            setNotes([]);
+            localStorage.removeItem("notes");
             window.location.href = "/";
           } else {
             const fetchedNotes = await getNotes(token);
             if (fetchedNotes && fetchedNotes.length > 0) {
               setNotes(fetchedNotes);
               localStorage.setItem("notes", JSON.stringify(fetchedNotes));
-            }
+            } else {
+              setNotes([]);
+              localStorage.removeItem("notes");
+            } 
           }
         } catch (error) {
           console.error("Error decoding token or fetching notes:", error);
@@ -127,6 +132,8 @@ function App() {
           setLogin(false);
           setIsEditing(false);
           setNoteToEdit(null);
+          setNotes([]);
+          localStorage.removeItem("notes");
           window.location.href = "/";
         }
       }
@@ -146,6 +153,13 @@ function App() {
   useEffect(() => {
     setLogin(!!token);
   }, [token]);
+
+  useEffect(() => {
+    if (!token) {
+      setNotes([]);
+    }
+  }, [token]);
+  
 
   function addNote(newNote) {
     setNotes((prevNotes) => {
@@ -216,6 +230,7 @@ function App() {
           setIsDeleting={setIsDeleting}
           setExpanded={setExpanded}
           setNoteToEdit={setNoteToEdit}
+          setNotes={setNotes}
         />
         <div className={`content-${content.type}`}>
           {alert.visible ? (

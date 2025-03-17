@@ -36,6 +36,7 @@ function Header(props) {
               setIsEditing={props.setIsEditing}
               setNoteToEdit={props.setIsEditing}
               setIsDeleting={props.setIsDeleting}
+              setNotes={props.setNotes}
             />
           </div>
         ) : null}
